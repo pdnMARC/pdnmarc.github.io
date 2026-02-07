@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@plugin "@tailwindcss/typography";
+
+@plugin "daisyui" {
+    themes: winter --default;
+}
+
+@plugin "daisyui/theme" {
+    name: "winter";
+    default: true;
+    --color-primary: #06A3DA;
+    --color-primary-content: #ffffff;
+}

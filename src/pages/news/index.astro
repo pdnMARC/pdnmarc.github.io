@@ -1,0 +1,215 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumb from "../../components/Breadcrumb.astro";
+import { Image } from "astro:assets";
+
+// --- LOGIC (Unchanged) ---
+// Fetch and sort by newest first
+const social_newsItems = await getCollection("social_news");
+const sortedNewssocial = social_newsItems.sort(
+    (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
+);
+
+// Helper to get icon based on source
+const getIconClass = (source: string) => {
+    if (source === "LinkedIn") return "text-[#0077b5]"; // Official LinkedIn Blue
+    if (source === "Facebook") return "text-[#1877F2]"; // Official FB Blue
+    return "text-base-content";
+};
+
+// 1. Fetch News
+const allNews = await getCollection("news");
+
+// 2. Sort by Date (Newest first)
+const sortedNews = allNews.sort(
+    (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
+);
+---
+
+<BaseLayout>
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <Breadcrumb>
+            <li><a href="/">Home</a></li>
+            <li>News</li>
+        </Breadcrumb>
+
+        <div class="text-center mb-16">
+            <h1 class="text-5xl font-bold mb-4 text-primary">
+                Lab News & Updates
+            </h1>
+            <p class="text-xl text-base-content/70 max-w-2xl mx-auto">
+                Discover our latest research milestones, awards, and community
+                activities.
+            </p>
+        </div>
+
+        {/* --- SECTION 1: FEATURED STORIES (Markdown Articles) --- */}
+        <section class="mb-20">
+            <div class="flex items-center gap-4 mb-8">
+                <h2 class="text-3xl font-bold text-base-content">
+                    Featured Stories
+                </h2>
+                <div class="h-px bg-base-300 flex-grow"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {
+                    sortedNews.map((item) => (
+                        <a
+                            href={`/news/${item.id}`}
+                            class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-2xl hover:-translate-y-1 hover:border-primary transition-all duration-300 group flex flex-col h-full"
+                        >
+                            {/* Cover Image Wrapper */}
+                            <figure class="aspect-video relative overflow-hidden bg-base-200">
+                                {item.data.cover ? (
+                                    <Image
+                                        src={item.data.cover}
+                                        alt={item.data.title}
+                                        width={600}
+                                        height={340}
+                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                ) : (
+                                    <div class="w-full h-full flex items-center justify-center bg-base-200 text-base-content/20">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="1.5"
+                                            stroke="currentColor"
+                                            class="w-16 h-16"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+                                            />
+                                        </svg>
+                                    </div>
+                                )}
+
+                                {/* Floating Date Badge */}
+                                <div class="absolute top-3 right-3">
+                                    <span class="badge bg-base-100/90 backdrop-blur-md shadow-sm font-mono text-xs font-bold py-3 border-0">
+                                        {item.data.date.toLocaleDateString(
+                                            "en-GB",
+                                            {
+                                                day: "numeric",
+                                                month: "short",
+                                                year: "numeric",
+                                            },
+                                        )}
+                                    </span>
+                                </div>
+                            </figure>
+
+                            {/* Card Content */}
+                            <div class="card-body p-6 flex flex-col flex-grow">
+                                <h3 class="card-title text-xl font-bold mb-3 group-hover:text-primary transition-colors leading-tight">
+                                    {item.data.title}
+                                </h3>
+                                <p class="text-sm text-base-content/70 line-clamp-3 mb-4 flex-grow">
+                                    {item.data.short}
+                                </p>
+                                <div class="card-actions justify-end mt-auto">
+                                    <span class="text-xs font-bold text-primary flex items-center gap-1 group-hover:underline">
+                                        Read Article
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                            class="w-4 h-4"
+                                        >
+                                            <path
+                                                fill-rule="evenodd"
+                                                d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.5a.75.75 0 010 1.08l-5.5 5.5a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z"
+                                                clip-rule="evenodd"
+                                            />
+                                        </svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    ))
+                }
+            </div>
+        </section>
+
+        {/* --- SECTION 2: SOCIAL FEED (External Links) --- */}
+        <section class="max-w-4xl mx-auto">
+            <div class="text-center mb-10">
+                <div class="badge badge-primary badge-outline mb-2">
+                    Social Feed
+                </div>
+                <h2 class="text-3xl font-bold">Latest Activity</h2>
+                <p class="text-base-content/60 mt-2">
+                    Updates directly from our social media channels.
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                {
+                    sortedNewssocial.map((item) => (
+                        <a
+                            href={item.data.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="card card-side bg-base-100 shadow-sm border border-base-200 hover:border-primary hover:shadow-md transition-all duration-200 group p-2 md:p-4 items-center"
+                        >
+                            {/* Date Box (Left Side) */}
+                            <div class="hidden md:flex flex-col items-center justify-center w-20 h-20 bg-base-200/50 rounded-xl text-center shrink-0 ml-2">
+                                <span class="text-2xl font-black text-primary">
+                                    {new Date(item.data.date).getDate()}
+                                </span>
+                                <span class="text-xs uppercase font-bold text-base-content/50">
+                                    {new Date(item.data.date).toLocaleString(
+                                        "default",
+                                        { month: "short" },
+                                    )}
+                                </span>
+                            </div>
+
+                            {/* Content Body */}
+                            <div class="card-body py-2 px-4 md:px-6 w-full">
+                                <div class="flex items-center gap-2 mb-1">
+                                    {/* Dynamic Icon Color */}
+                                    <span
+                                        class={`text-xs font-bold uppercase tracking-wider flex items-center gap-1 ${getIconClass(item.data.source)}`}
+                                    >
+                                        {/* Icon SVG */}
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                            class="w-4 h-4"
+                                        >
+                                            <path d="M12.232 4.232a2.5 2.5 0 013.536 3.536l-1.225 1.224a.75.75 0 001.061 1.06l1.224-1.224a4 4 0 00-5.656-5.656l-3 3a4 4 0 00.225 5.865.75.75 0 00.977-1.138 2.5 2.5 0 01-.142-3.667l3-3z" />
+                                            <path d="M11.603 7.96a.75.75 0 00-.977 1.138 2.5 2.5 0 01.142 3.667l-3 3a2.5 2.5 0 01-3.536-3.536l1.225-1.224a.75.75 0 00-1.061-1.06l-1.224 1.224a4 4 0 105.656 5.656l3-3a4 4 0 00-.225-5.865z" />
+                                        </svg>
+                                        {item.data.source}
+                                    </span>
+                                    <span class="text-xs text-base-content/40 md:hidden">
+                                        •{" "}
+                                        {new Date(
+                                            item.data.date,
+                                        ).toLocaleDateString()}
+                                    </span>
+                                </div>
+
+                                <h3 class="text-lg font-bold group-hover:text-primary transition-colors">
+                                    {item.data.title}
+                                </h3>
+
+                                <p class="text-xs text-base-content/50 mt-1 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                                    View original post{" "}
+                                    <span aria-hidden="true">&rarr;</span>
+                                </p>
+                            </div>
+                        </a>
+                    ))
+                }
+            </div>
+        </section>
+    </div>
+</BaseLayout>

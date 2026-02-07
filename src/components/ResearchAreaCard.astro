@@ -1,0 +1,19 @@
+---
+import "../styles/app.css";
+const { Area, ImageUrl, PageLink } = Astro.props;
+---
+
+<div class="card lg:card-side bg-base-100 shadow-xl">
+    <figure class="w-full lg:w-72 lg:h-72 shrink-0">
+        <img src={ImageUrl.src} alt="Album" />
+    </figure>
+    <div class="card-body">
+        <h2 class="card-title">{Area}</h2>
+        <p>
+            <slot />
+        </p>
+        <div class="card-actions justify-end">
+            <a href={PageLink} class="btn btn-primary">Read More</a>
+        </div>
+    </div>
+</div>

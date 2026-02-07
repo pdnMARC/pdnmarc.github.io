@@ -1,0 +1,101 @@
+---
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import default_avatar from "../../assets/avatar_default.svg";
+import Breadcrumb from "../../components/Breadcrumb.astro";
+
+const people = await getCollection("people");
+
+// 1. Define the order you want the roles to appear in
+const roleOrder = ["Deputy Director", "Research Assistant"];
+
+// 2. Group the people by their 'post'
+const groupedPeople = people.reduce<Record<string, (typeof people)[number][]>>(
+    (acc, person) => {
+        const role = person.data.post ?? "Unspecified";
+        if (!acc[role]) acc[role] = [];
+        acc[role].push(person);
+        return acc;
+    },
+    {},
+);
+
+// 3. Sort the roles based on your custom order
+// Any role NOT in the list will be sorted alphabetically at the bottom
+const sortedRoles = Object.keys(groupedPeople).sort((a, b) => {
+    const indexA = roleOrder.indexOf(a);
+    const indexB = roleOrder.indexOf(b);
+
+    if (indexA !== -1 && indexB !== -1) return indexA - indexB; // Both in list
+    if (indexA !== -1) return -1; // Only A in list
+    if (indexB !== -1) return 1; // Only B in list
+    return a.localeCompare(b); // Neither in list (sort alphabetical)
+});
+---
+
+<BaseLayout>
+    <Breadcrumb>
+        <li><a href="/">Home</a></li>
+        <li>People</li>
+    </Breadcrumb>
+    <div class="text-center mb-16">
+        <h1 class="text-4xl font-bold text-primary mb-2">Our People</h1>
+        <p class="text-base-content/70">Meet the team.</p>
+    </div>
+
+    {/* 4. Loop through the sorted categories */}
+    <div class="space-y-16">
+        {
+            sortedRoles.map((role) => (
+                <div id={role.toLowerCase().replace(/\s+/g, "-")}>
+                    {/* Category Header */}
+                    <div class="flex items-center gap-4 mb-8">
+                        <h2 class="text-2xl font-bold text-secondary shrink-0">
+                            {role}s
+                        </h2>
+                        <div class="h-px bg-base-300 w-full" />
+                    </div>
+
+                    {/* Grid for this Category */}
+                    <ul class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {groupedPeople[role].map((person) => (
+                            <li>
+                                <a
+                                    href={`/people/${person.id}/`}
+                                    class="card card-side bg-base-100 shadow-sm border border-base-200 hover:shadow-md hover:border-primary transition-all duration-300 h-full group"
+                                >
+                                    <figure class="px-5 py-5">
+                                        <div class="avatar">
+                                            <div class="w-16 h-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 group-hover:scale-105 transition-transform duration-300">
+                                                <Image
+                                                    src={
+                                                        person.data.photo ||
+                                                        default_avatar
+                                                    }
+                                                    alt={person.data.name}
+                                                    class="object-cover"
+                                                    width={100}
+                                                    height={100}
+                                                />
+                                            </div>
+                                        </div>
+                                    </figure>
+
+                                    <div class="card-body py-5 pr-5">
+                                        <h3 class="card-title text-lg font-bold text-base-content group-hover:text-primary transition-colors">
+                                            {person.data.name}
+                                        </h3>
+                                        <p class="text-xs text-base-content/60 break-all">
+                                            {person.data.email}
+                                        </p>
+                                    </div>
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            ))
+        }
+    </div>
+</BaseLayout>

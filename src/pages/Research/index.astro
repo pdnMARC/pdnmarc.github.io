@@ -1,0 +1,38 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import "../../styles/app.css";
+import ResearchAreaCard from "../../components/ResearchAreaCard.astro";
+import Breadcrumb from "../../components/Breadcrumb.astro";
+const researchAreas = Object.values(
+    import.meta.glob("./*.md", { eager: true }),
+);
+const images = import.meta.glob<{ default: ImageMetadata }>(
+    "/src/assets/*.{jpeg,jpg,png,gif}",
+    { eager: true },
+);
+const imagekey_to_src = (imageKey: string) => {
+    imageKey = `/src/assets/${imageKey}`;
+    return images[imageKey].default;
+};
+---
+
+<BaseLayout>
+    <Breadcrumb>
+        <li><a href="/">Home</a></li>
+        <li>Research Areas</li>
+    </Breadcrumb>
+    <main class="flex flex-col gap-10">
+        <h1 class="text-6xl font-bold mb-4">Research Areas</h1>
+        {
+            researchAreas.map((Area: any) => (
+                <ResearchAreaCard
+                    Area={Area.frontmatter.title}
+                    ImageUrl={imagekey_to_src(Area.frontmatter.coverImage)}
+                    PageLink={Area.url}
+                >
+                    {Area.frontmatter.short}
+                </ResearchAreaCard>
+            ))
+        }
+    </main>
+</BaseLayout>

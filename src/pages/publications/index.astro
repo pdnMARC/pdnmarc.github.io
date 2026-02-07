@@ -1,0 +1,29 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumb from "../../components/Breadcrumb.astro";
+import PublicationsList from "../../components/react/PublicationList";
+import { getCollection } from "astro:content";
+
+const publications = await getCollection("publications");
+---
+
+<BaseLayout title="Publications">
+    <div class="max-w-5xl mx-auto px-4 py-8">
+        <Breadcrumb>
+            <li><a href="/">Home</a></li>
+            <li>Publications</li>
+        </Breadcrumb>
+
+        <div class="mb-8 text-center">
+            <h1 class="text-5xl font-bold mb-4 text-primary">Publications</h1>
+            <p class="text-lg text-base-content/70">
+                Our latest contributions to Journals and Conferences.
+            </p>
+        </div>
+
+        {
+            /* Hydrate the component with client:load so it's interactive immediately */
+        }
+        <PublicationsList publications={publications} client:load />
+    </div>
+</BaseLayout>
