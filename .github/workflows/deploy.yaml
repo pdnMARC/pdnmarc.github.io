@@ -1,14 +1,10 @@
 name: Deploy to GitHub Pages
 
 on:
-  # Trigger the workflow every time you push to the `main` branch
-  # Using a different branch name? Replace `main` with your branch’s name
   push:
     branches: [ main ]
-  # Allows you to run this workflow manually from the Actions tab on GitHub.
   workflow_dispatch:
 
-# Allow this job to clone the repo and create a page deployment
 permissions:
   contents: read
   pages: write
@@ -17,18 +13,32 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout your repository using git
+      # 1️⃣ Checkout main Astro repo
+      - name: Checkout main repository
         uses: actions/checkout@v5
+
+      # 2️⃣ Remove local debug collection
+      - name: Remove local debug people collection
+        run: rm -rf src/collection_people
+
+      # 3️⃣ Clone marc_people into the correct location
+      - name: Clone marc_people repository
+        uses: actions/checkout@v5
+        with:
+          repository: your-org/marc_people
+          path: src/collection_people
+          fetch-depth: 1
+          # If marc_people is private:
+          # token: ${{ secrets.MARC_PEOPLE_READ_TOKEN }}
+
+      # 4️⃣ Install, build, and upload
       - name: Install, build, and upload your site
         uses: withastro/action@v5
         # with:
-          # path: . # The root location of your Astro project inside the repository. (optional)
-          # node-version: 24 # The specific version of Node that should be used to build your site. Defaults to 22. (optional)
-          # package-manager: pnpm@latest # The Node package manager that should be used to install dependencies and build your site. Automatically detected based on your lockfile. (optional)
-          # build-cmd: pnpm run build # The command to run to build your site. Runs the package build script/task by default. (optional)
-        # env:
-          # PUBLIC_POKEAPI: 'https://pokeapi.co/api/v2' # Use single quotation marks for the variable value. (optional)
+        #   node-version: 22
+        #   package-manager: pnpm@latest
 
   deploy:
     needs: build
