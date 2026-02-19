@@ -11,7 +11,7 @@ import { z } from 'astro/zod';
 const projects = defineCollection({
     loader: glob(
         {
-            pattern: "**/*.md",
+            pattern: "**/!(*README).md",
             base: "src/collection_projects/"
         }
     ),
