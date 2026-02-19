@@ -11,7 +11,7 @@ import { z } from 'astro/zod';
 const projects = defineCollection({
     loader: glob(
         {
-            pattern: "**/!(*README).md",
+            pattern: '**/!([Rr][Ee][Aa][Dd][Mm][Ee]).md',
             base: "src/collection_projects/"
         }
     ),
@@ -29,7 +29,7 @@ const projects = defineCollection({
 const people = defineCollection({
     loader: glob(
         {
-            pattern: "**/*.md",
+            pattern: '**/!([Rr][Ee][Aa][Dd][Mm][Ee]).md',
             base: "src/collection_people/"
         }
     ),
@@ -73,7 +73,10 @@ const social_news = defineCollection({
 
 const news = defineCollection({
     // Load markdown files from your specific folder
-    loader: glob({ pattern: "**/*.md", base: "src/collection_news/" }),
+    loader: glob({
+        pattern: '**/!([Rr][Ee][Aa][Dd][Mm][Ee]).md',
+        base: "src/collection_news/"
+    }),
     schema: ({ image }) => z.object({
         title: z.string(),
         date: z.date(), // Zod will automatically parse the YYYY-MM-DD string
