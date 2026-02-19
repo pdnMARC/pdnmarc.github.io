@@ -27,7 +27,7 @@ jobs:
       - name: Clone marc_people repository
         uses: actions/checkout@v5
         with:
-          repository: your-org/marc_people
+          repository: pdnMARC/marc_people
           path: src/collection_people
           fetch-depth: 1
           # If marc_people is private:
