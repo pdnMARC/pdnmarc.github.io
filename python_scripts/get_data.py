@@ -1,6 +1,6 @@
 import pandas as pd
 
-SHEET_ID = "1lardxEdOL6BTCCHxjU3uGfWWE30H4kxv5pO5OklLwKs"
+SHEET_ID = "1vhvcqlhc_bTdGScX3iYQ4T9HTD2uLbKD22rsrI_qA8U"
 PUBLICATION_GID = "0"
 NEWS_GID = "2048258914"
 
