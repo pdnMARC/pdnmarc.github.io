@@ -56,6 +56,25 @@ jobs:
           # If marc_news is private:
           # token: ${{ secrets.MARC_NEWS_READ_TOKEN }}
 
+      # -----------------------------
+      # 🐍 Python Setup using uv
+      # -----------------------------
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Sync Python dependencies
+        run: uv sync --frozen
+
+      - name: Run Python scripts
+        run: uv run python_scripts/get_data.py 
+      
+
       # Install, build, and upload
       - name: Install, build, and upload your site
         uses: withastro/action@v5
