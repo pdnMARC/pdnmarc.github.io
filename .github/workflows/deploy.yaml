@@ -15,15 +15,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout main Astro repo
+      # Checkout main Astro repo
       - name: Checkout main repository
         uses: actions/checkout@v5
 
-      # 2️⃣ Remove local debug collection
-      - name: Remove local debug people collection
-        run: rm -rf src/collection_people
+      # Remove local debug collection
+      - name: Remove local debug collections
+        run: |
+         rm -rf src/collection_people
+         rm -rf src/collection_projects
 
-      # 3️⃣ Clone marc_people into the correct location
+      # Clone marc_people into the correct location
       - name: Clone marc_people repository
         uses: actions/checkout@v5
         with:
@@ -33,7 +35,17 @@ jobs:
           # If marc_people is private:
           # token: ${{ secrets.MARC_PEOPLE_READ_TOKEN }}
 
-      # 4️⃣ Install, build, and upload
+      # Clone marc_projects into the correct location
+      - name: Clone marc_projects repository
+        uses: actions/checkout@v5
+        with:
+          repository: pdnMARC/marc_projects
+          path: src/collection_projects
+          fetch-depth: 1
+          # If marc_people is private:
+          # token: ${{ secrets.MARC_PEOPLE_READ_TOKEN }}
+
+      # Install, build, and upload
       - name: Install, build, and upload your site
         uses: withastro/action@v5
         # with:
