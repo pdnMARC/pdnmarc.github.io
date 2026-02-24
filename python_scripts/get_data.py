@@ -8,9 +8,9 @@ NEWS_GID = "2048258914"
 def get_publications():
     url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={PUBLICATION_GID}"
     df = pd.read_csv(url)
-    print(df)
     # drop empty rows
-    df = df.dropna(how="all")
+    df = df.dropna(how="any")
+    print(df)
     # rename columns to make lower case and remove spaces
     df.columns = [col.strip().replace(" ", "_").lower() for col in df.columns]
     df["authors"] = df["authors"].apply(
@@ -28,7 +28,7 @@ def get_publications():
     )
     df["id"] = df.index + 1
     df.to_json(
-        "src/publication_collection/publications.json", orient="records", indent=2
+        "src/collection_publications/publications.json", orient="records", indent=2
     )
     return df
 
@@ -43,7 +43,7 @@ def get_news():
     # rename columns to make lower case and remove spaces
     df.columns = [col.strip().replace(" ", "_").lower() for col in df.columns]
     df["id"] = df.index + 1
-    df.to_json("src/news_collection/social_news.json", orient="records", indent=2)
+    df.to_json("src/collection_news/social_news.json", orient="records", indent=2)
     return df
 
 
