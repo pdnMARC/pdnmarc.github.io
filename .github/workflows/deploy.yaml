@@ -24,6 +24,7 @@ jobs:
         run: |
          rm -rf src/collection_people
          rm -rf src/collection_projects
+         rm -rf src/collection_news
 
       # Clone marc_people into the correct location
       - name: Clone marc_people repository
@@ -44,6 +45,16 @@ jobs:
           fetch-depth: 1
           # If marc_people is private:
           # token: ${{ secrets.MARC_PEOPLE_READ_TOKEN }}
+
+      # Clone marc_news into the correct location
+      - name: Clone marc_news repository
+        uses: actions/checkout@v5
+        with:
+          repository: pdnMARC/marc_news
+          path: src/collection_news
+          fetch-depth: 1
+          # If marc_news is private:
+          # token: ${{ secrets.MARC_NEWS_READ_TOKEN }}
 
       # Install, build, and upload
       - name: Install, build, and upload your site
