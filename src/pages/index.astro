@@ -5,7 +5,7 @@ import { getCollection } from "astro:content";
 import { Image } from "astro:assets";
 import "../styles/app.css";
 import logo from "../assets/logo.png";
-import heroImage from "../assets/Home_page_Design.jpeg";
+import heroImage from "../assets/Home_page_design.jpeg";
 
 // 1. Fetch Research Areas (Same logic as src/pages/Research/index.astro)
 const researchAreas = Object.values(
@@ -34,15 +34,15 @@ const latestNews = allNews
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
             <!-- Left Content: Text-focused and grounded -->
             <div class="lg:col-span-5 order-2 lg:order-1 relative z-10">
-                <div class="inline-flex items-center gap-2 mb-6 text-sm font-bold tracking-widest text-[#bf3034] bg-[#bf3034]/5 px-4 py-2 rounded-lg border border-[#bf3034]/10 uppercase">
+                <div class="inline-flex items-center gap-2 mb-6 text-sm font-bold tracking-widest text-[#06A3DA] bg-[#06A3DA]/5 px-4 py-2 rounded-lg border border-[#06A3DA]/10 uppercase">
                     Innovation for Humanity
                 </div>
                 
                 <h1 class="text-4xl md:text-5xl font-black mb-8 leading-[1.05] tracking-tight text-gray-900">
                     Multidisciplinary <br/>
-                    <span class="text-[#77b2d1] relative inline-block">
+                    <span class="text-[#06A3DA] relative inline-block">
                         AI Research Centre
-                        <span class="absolute -bottom-2 left-0 w-1/2 h-2 bg-[#bf3034] rounded-full opacity-20"></span>
+                        <span class="absolute -bottom-2 left-0 w-1/2 h-2 bg-[#06A3DA] rounded-full opacity-20"></span>
                     </span>
                 </h1>
                 
@@ -50,7 +50,7 @@ const latestNews = allNews
                         Empowering the Future through Multidisciplinary AI Research                 </p>
                 
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="/Research" class="group relative px-5 py-5 bg-[#bf3034] text-white rounded-2xl font-bold text-lg overflow-hidden shadow-2xl shadow-[#bf3034]/30 transition-all hover:-translate-y-1">
+                    <a href="/Research" class="group relative px-5 py-5 bg-[#06A3DA] text-white rounded-2xl font-bold text-lg overflow-hidden shadow-2xl shadow-[#06A3DA]/30 transition-all hover:-translate-y-1">
                         <span class="relative z-10 flex items-center justify-center gap-2">
                             Explore Research
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -58,7 +58,7 @@ const latestNews = allNews
                             </svg>
                         </span>
                     </a>
-                    <a href="/projects" class="px-10 py-5 bg-[#77b2d1]/10 text-[#77b2d1] border-2 border-[#77b2d1]/20 rounded-2xl font-bold text-lg transition-all hover:bg-[#77b2d1]/20 hover:border-[#77b2d1]/40 text-center">
+                    <a href="/projects" class="px-10 py-5 bg-[#06A3DA]/10 text-[#06A3DA] border-2 border-[#06A3DA]/20 rounded-2xl font-bold text-lg transition-all hover:bg-[#06A3DA]/20 hover:border-[#06A3DA]/40 text-center">
                         View Projects
                     </a>
                 </div>
@@ -67,7 +67,7 @@ const latestNews = allNews
             <!-- Right Visual: The Humanized Context -->
             <div class="lg:col-span-7 order-1 lg:order-2 relative">
                 <!-- Decorative Frame/Shadow -->
-                <div class="absolute -inset-4 bg-gradient-to-tr from-[#77b2d1]/30 to-[#bf3034]/10 rounded-[3rem] blur-2xl opacity-50 -z-10"></div>
+                <div class="absolute -inset-4 bg-gradient-to-tr from-[#06A3DA]/30 to-[#06A3DA]/10 rounded-[3rem] blur-2xl opacity-50 -z-10"></div>
                 
                 <!-- Main Image Container -->
                 <div class="relative rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white group">
@@ -78,7 +78,7 @@ const latestNews = allNews
                     />
 
                 <!-- Abstract "Human Connection" element -->
-                <div class="absolute -top-10 -right-10 w-32 h-32 bg-[#bf3034] rounded-full blur-[60px] opacity-20 hidden lg:block animate-pulse"></div>
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-[#06A3DA] rounded-full blur-[60px] opacity-20 hidden lg:block animate-pulse"></div>
             </div>
         </div>
     </section>
