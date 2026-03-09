@@ -3,27 +3,7 @@ layout: ../../layouts/ResearchArea.astro
 title: Biomedical Engineering and Wearables
 coverImage: BioMedical.png
 short: >
-    Computer vision tasks include methods for acquiring, processing,
-    analyzing, and understanding digital images, and extraction of
-    high-dimensional data from the real world in order to produce
-    numerical or symbolic information, e.g. in the form of
-    decisions."Understanding" in this context signifies the
-    transformation of visual images (the input to the retina) into
-    descriptions of the world that make sense to thought processes and
-    can elicit appropriate action. This image understanding can be seen
-    as the disentangling of symbolic information from image data using
-    models constructed with the aid of geometry, physics, statistics,
-    and learning theory.
+    This research area sits at the intersection of engineering and medicine, focusing on the development of next-generation Wearable Health Devices (WHDs) for continuous, non-invasive patient monitoring. By leveraging advanced physiological signal processing (e.g., extracting precise features from ECG, EEG, and EMG data) and embedding machine learning algorithms directly into resource-constrained edge devices, we aim to translate raw biomedical data into actionable clinical insights. Our work encompasses the design of novel multimodal biosensors, real-time artifact reduction, and predictive modeling, ultimately driving the shift toward proactive, personalized healthcare and intelligent diagnostic systems.
 ---
 
-Computer vision tasks include methods for acquiring, processing,
-analyzing, and understanding digital images, and extraction of
-high-dimensional data from the real world in order to produce
-numerical or symbolic information, e.g. in the form of
-decisions."Understanding" in this context signifies the
-transformation of visual images (the input to the retina) into
-descriptions of the world that make sense to thought processes and
-can elicit appropriate action. This image understanding can be seen
-as the disentangling of symbolic information from image data using
-models constructed with the aid of geometry, physics, statistics,
-and learning theory.
+This research area sits at the intersection of engineering and medicine, focusing on the development of next-generation Wearable Health Devices (WHDs) for continuous, non-invasive patient monitoring. By leveraging advanced physiological signal processing (e.g., extracting precise features from ECG, EEG, and EMG data) and embedding machine learning algorithms directly into resource-constrained edge devices, we aim to translate raw biomedical data into actionable clinical insights. Our work encompasses the design of novel multimodal biosensors, real-time artifact reduction, and predictive modeling, ultimately driving the shift toward proactive, personalized healthcare and intelligent diagnostic systems.

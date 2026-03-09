@@ -1,29 +1,9 @@
 ---
 layout: ../../layouts/ResearchArea.astro
 title: Smart Grid
-coverImage: BioMedical.png
+coverImage: Smart_Grid_Cover.png
 short: >
-    Computer vision tasks include methods for acquiring, processing,
-    analyzing, and understanding digital images, and extraction of
-    high-dimensional data from the real world in order to produce
-    numerical or symbolic information, e.g. in the form of
-    decisions."Understanding" in this context signifies the
-    transformation of visual images (the input to the retina) into
-    descriptions of the world that make sense to thought processes and
-    can elicit appropriate action. This image understanding can be seen
-    as the disentangling of symbolic information from image data using
-    models constructed with the aid of geometry, physics, statistics,
-    and learning theory.
+    This research area focuses on transforming traditional power networks into autonomous, data-driven ecosystems. By integrating advanced signal processing, machine learning, and stochastic optimization, we develop solutions for the seamless integration of distributed renewable energy sources and the enhancement of grid resilience. A core component of our work involves demand-side management, leveraging techniques such as Non-Intrusive Load Monitoring (NILM) and real-time data analytics to optimize energy consumption patterns and ensure a stable, sustainable energy future.
 ---
 
-Computer vision tasks include methods for acquiring, processing,
-analyzing, and understanding digital images, and extraction of
-high-dimensional data from the real world in order to produce
-numerical or symbolic information, e.g. in the form of
-decisions."Understanding" in this context signifies the
-transformation of visual images (the input to the retina) into
-descriptions of the world that make sense to thought processes and
-can elicit appropriate action. This image understanding can be seen
-as the disentangling of symbolic information from image data using
-models constructed with the aid of geometry, physics, statistics,
-and learning theory.
+This research area focuses on transforming traditional power networks into autonomous, data-driven ecosystems. By integrating advanced signal processing, machine learning, and stochastic optimization, we develop solutions for the seamless integration of distributed renewable energy sources and the enhancement of grid resilience. A core component of our work involves demand-side management, leveraging techniques such as Non-Intrusive Load Monitoring (NILM) and real-time data analytics to optimize energy consumption patterns and ensure a stable, sustainable energy future.

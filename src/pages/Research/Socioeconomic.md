@@ -1,29 +1,9 @@
 ---
 layout: ../../layouts/ResearchArea.astro
 title: Socioeconomic
-coverImage: BioMedical.png
+coverImage: socioeconomic.png
 short: >
-    Computer vision tasks include methods for acquiring, processing,
-    analyzing, and understanding digital images, and extraction of
-    high-dimensional data from the real world in order to produce
-    numerical or symbolic information, e.g. in the form of
-    decisions."Understanding" in this context signifies the
-    transformation of visual images (the input to the retina) into
-    descriptions of the world that make sense to thought processes and
-    can elicit appropriate action. This image understanding can be seen
-    as the disentangling of symbolic information from image data using
-    models constructed with the aid of geometry, physics, statistics,
-    and learning theory.
+    This research area focuses on the critical intersection of artificial intelligence and human systems. By leveraging advanced machine learning and data analytics, we aim to understand and address complex societal challenges. Our current projects encompass a wide range of multidisciplinary efforts, including modeling human-animal behavioral dynamics, conducting deep demographic studies, analyzing large-scale mobility patterns, and developing innovative AI solutions for education. Ultimately, this group strives to translate data-driven insights into actionable strategies that improve socio-economic well-being and foster sustainable growth.
 ---
 
-Computer vision tasks include methods for acquiring, processing,
-analyzing, and understanding digital images, and extraction of
-high-dimensional data from the real world in order to produce
-numerical or symbolic information, e.g. in the form of
-decisions."Understanding" in this context signifies the
-transformation of visual images (the input to the retina) into
-descriptions of the world that make sense to thought processes and
-can elicit appropriate action. This image understanding can be seen
-as the disentangling of symbolic information from image data using
-models constructed with the aid of geometry, physics, statistics,
-and learning theory.
+This research area focuses on the critical intersection of artificial intelligence and human systems. By leveraging advanced machine learning and data analytics, we aim to understand and address complex societal challenges. Our current projects encompass a wide range of multidisciplinary efforts, including modeling human-animal behavioral dynamics, conducting deep demographic studies, analyzing large-scale mobility patterns, and developing innovative AI solutions for education. Ultimately, this group strives to translate data-driven insights into actionable strategies that improve socio-economic well-being and foster sustainable growth.
