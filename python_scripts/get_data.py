@@ -23,8 +23,9 @@ def get_publications():
             .split(";")
         ]
     )
+    # only keep the author if it is not empty
     df["people"] = df["people"].apply(
-        lambda x: [author.strip() for author in x.split(" ")]
+        lambda x: [author.strip() for author in x.split(" ") if len(author.strip()) > 0]
     )
     df["id"] = df.index + 1
     df.to_json(
