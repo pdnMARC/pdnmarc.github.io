@@ -12,4 +12,4 @@ coverImage: ./cover_images/INR.png
 ---
 
 This is a dummy project 
-<img src="cover_images/cover_dummy.jpg" alt="Example">
+![Example](cover_images/cover_dummy.jpg)
