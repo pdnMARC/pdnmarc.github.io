@@ -21,6 +21,10 @@ jobs:
       - name: Checkout main repository
         uses: actions/checkout@v5
 
+      # 👇 Add the logging step here
+      - name: Print trigger info
+        run: echo "Triggered by ${{ github.event.client_payload.source }}"
+
       # Remove local debug collection
       - name: Remove local debug collections
         run: |
