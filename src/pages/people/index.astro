@@ -8,7 +8,12 @@ import Breadcrumb from "../../components/Breadcrumb.astro";
 const people = await getCollection("people");
 
 // 1. Define the order you want the roles to appear in
-const roleOrder = ["Director", "Deputy Director", "Research Assistant"];
+const roleOrder = [
+    "Director",
+    "Deputy Director",
+    "Research Assistant",
+    "Volunteer",
+];
 
 // 2. Group the people by their 'post'
 const groupedPeople = people.reduce<Record<string, (typeof people)[number][]>>(
