@@ -5,9 +5,9 @@
 At a high level, this repository provides the website application itself: layouts, pages, components, styling, routing, and the content schemas that define what data the site expects.
 
 The actual content is split across separate repositories:
-- `marc_people`
-- `marc_projects`
-- `marc_news`
+- [`marc_people`](https://github.com/pdnMARC/marc_people)
+- [`marc_projects`](https://github.com/pdnMARC/marc_projects)
+- [`marc_news`](https://github.com/pdnMARC/marc_news)
 
 In addition, some structured data is pulled from a shared Google Sheet and converted into JSON during the build/update flow.
 
@@ -23,7 +23,7 @@ The website is built with:
 
 The main idea is:
 - this repository defines the website code and the content schemas
-- `marc_people`, `marc_projects`, and `marc_news` hold the Markdown content and images for their respective sections
+- [`marc_people`](https://github.com/pdnMARC/marc_people), [`marc_projects`](https://github.com/pdnMARC/marc_projects), and [`marc_news`](https://github.com/pdnMARC/marc_news) hold the Markdown content and images for their respective sections
 - a Google Sheet provides publication data and social feed data
 - the deployment workflow pulls all of this together, then builds and deploys the site
 
@@ -42,17 +42,17 @@ flowchart TD
 
 ## :card_file_box: External content repositories
 
-### `marc_people`
+### [`marc_people`](https://github.com/pdnMARC/marc_people)
 Stores the people profiles used by the website.
 
 These entries are cloned into the website build as the people collection.
 
-### `marc_projects`
+### [`marc_projects`](https://github.com/pdnMARC/marc_projects)
 Stores the project Markdown files and cover images.
 
 These entries are cloned into the website build as the projects collection.
 
-### `marc_news`
+### [`marc_news`](https://github.com/pdnMARC/marc_news)
 Stores the Markdown news articles and cover images.
 
 These entries are cloned into the website build as the news collection.
@@ -66,17 +66,17 @@ This sheet is used for:
 - publications
 - social feed / social news items
 
-During the update/build flow, the Python script [python_scripts/get_data.py](C:\Users\ASUS\Projects\MARC_Website\Marc_Website_v1\MARC_Website\python_scripts\get_data.py) downloads CSV exports from the relevant sheet tabs and writes:
+During the update/build flow, the Python script [`python_scripts/get_data.py`](https://github.com/pdnMARC/pdnmarc.github.io/blob/main/python_scripts/get_data.py) downloads CSV exports from the relevant sheet tabs and writes:
 - `src/collection_publications/publications.json`
 - `src/collection_news/social_news.json`
 
 So the website has two kinds of news-related content:
-- full Markdown news articles from `marc_news`
+- full Markdown news articles from [`marc_news`](https://github.com/pdnMARC/marc_news)
 - shorter social feed items from the Google Sheet
 
 ## :rocket: Deployment flow
 
-The deployment workflow lives at [.github/workflows/deploy.yaml](C:\Users\ASUS\Projects\MARC_Website\Marc_Website_v1\MARC_Website\.github\workflows\deploy.yaml).
+The deployment workflow lives at [`.github/workflows/deploy.yaml`](https://github.com/pdnMARC/pdnmarc.github.io/blob/main/.github/workflows/deploy.yaml).
 
 At a high level it does the following:
 1. Checks out this repository.
@@ -92,7 +92,7 @@ This means the live site is assembled from multiple sources during deployment, r
 
 ## :bookmark_tabs: Content schemas
 
-The content schemas are defined in [src/content.config.ts](C:\Users\ASUS\Projects\MARC_Website\Marc_Website_v1\MARC_Website\src\content.config.ts).
+The content schemas are defined in [`src/content.config.ts`](https://github.com/pdnMARC/pdnmarc.github.io/blob/main/src/content.config.ts).
 
 That file is the main place where the website defines what each collection should look like.
 
@@ -118,7 +118,7 @@ uv sync
 uv run python_scripts/get_data.py
 ```
 
-The Python dependencies are defined in [pyproject.toml](C:\Users\ASUS\Projects\MARC_Website\Marc_Website_v1\MARC_Website\pyproject.toml) and locked in [uv.lock](C:\Users\ASUS\Projects\MARC_Website\Marc_Website_v1\MARC_Website\uv.lock).
+The Python dependencies are defined in [`pyproject.toml`](https://github.com/pdnMARC/pdnmarc.github.io/blob/main/pyproject.toml) and locked in [`uv.lock`](https://github.com/pdnMARC/pdnmarc.github.io/blob/main/uv.lock).
 
 ## :compass: What to edit, depending on the type of change
 
@@ -134,9 +134,9 @@ Examples:
 - spreadsheet sync logic
 
 If you want to change content, usually edit one of the content repositories instead:
-- `marc_people` for people profiles
-- `marc_projects` for project entries
-- `marc_news` for Markdown news articles
+- [`marc_people`](https://github.com/pdnMARC/marc_people) for people profiles
+- [`marc_projects`](https://github.com/pdnMARC/marc_projects) for project entries
+- [`marc_news`](https://github.com/pdnMARC/marc_news) for Markdown news articles
 
 If you want to update publications or social feed items, use the Google Sheet rather than editing generated JSON by hand.
 
@@ -151,10 +151,10 @@ A few practical points:
 ## :link: Repository role in the larger setup
 
 A short summary of responsibilities:
-- `MARC_Website`: website code, page rendering, schemas, deployment, spreadsheet sync
-- `marc_people`: people Markdown content
-- `marc_projects`: projects Markdown content
-- `marc_news`: Markdown news content
+- [`MARC_Website`](https://github.com/pdnMARC/pdnmarc.github.io): website code, page rendering, schemas, deployment, spreadsheet sync
+- [`marc_people`](https://github.com/pdnMARC/marc_people): people Markdown content
+- [`marc_projects`](https://github.com/pdnMARC/marc_projects): projects Markdown content
+- [`marc_news`](https://github.com/pdnMARC/marc_news): Markdown news content
 - Google Sheet: publications and social feed source data
 
 ## :memo: Future documentation
