@@ -1,46 +1,164 @@
-# Astro Starter Kit: Basics
+# MARC Website
 
-```sh
-npm create astro@latest -- --template basics
+This repository contains the main Astro-based website for the Multidisciplinary AI Research Centre (MARC).
+
+At a high level, this repository provides the website application itself: layouts, pages, components, styling, routing, and the content schemas that define what data the site expects.
+
+The actual content is split across separate repositories:
+- `marc_people`
+- `marc_projects`
+- `marc_news`
+
+In addition, some structured data is pulled from a shared Google Sheet and converted into JSON during the build/update flow.
+
+## Overview
+
+The website is built with:
+- `Astro` for the site framework and content collections
+- `Tailwind CSS` and `daisyUI` for styling
+- `Python` plus `pandas` for syncing spreadsheet-based data
+- `GitHub Actions` for deployment
+
+## How the setup works
+
+The main idea is:
+- this repository defines the website code and the content schemas
+- `marc_people`, `marc_projects`, and `marc_news` hold the Markdown content and images for their respective sections
+- a Google Sheet provides publication data and social feed data
+- the deployment workflow pulls all of this together, then builds and deploys the site
+
+## High-level architecture
+
+```mermaid
+flowchart TD
+    A[MARC_Website repo\nAstro site, pages, layouts, schemas] --> B[GitHub Actions deploy workflow]
+    C[marc_people repo\npeople profiles] --> B
+    D[marc_projects repo\nproject entries] --> B
+    E[marc_news repo\nmarkdown news articles] --> B
+    F[Google Sheet\npublications + social feed] --> G[python_scripts/get_data.py]
+    G --> B
+    B --> H[Built site on GitHub Pages]
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## External content repositories
 
-## 🚀 Project Structure
+### `marc_people`
+Stores the people profiles used by the website.
 
-Inside of your Astro project, you'll see the following folders and files:
+These entries are cloned into the website build as the people collection.
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+### `marc_projects`
+Stores the project Markdown files and cover images.
+
+These entries are cloned into the website build as the projects collection.
+
+### `marc_news`
+Stores the Markdown news articles and cover images.
+
+These entries are cloned into the website build as the news collection.
+
+## Google Sheet data source
+
+The website also pulls structured data from this Google Sheet:
+- `https://docs.google.com/spreadsheets/d/1vhvcqlhc_bTdGScX3iYQ4T9HTD2uLbKD22rsrI_qA8U/edit?usp=sharing`
+
+This sheet is used for:
+- publications
+- social feed / social news items
+
+During the update/build flow, the Python script [python_scripts/get_data.py](C:\Users\ASUS\Projects\MARC_Website\Marc_Website_v1\MARC_Website\python_scripts\get_data.py) downloads CSV exports from the relevant sheet tabs and writes:
+- `src/collection_publications/publications.json`
+- `src/collection_news/social_news.json`
+
+So the website has two kinds of news-related content:
+- full Markdown news articles from `marc_news`
+- shorter social feed items from the Google Sheet
+
+## Deployment flow
+
+The deployment workflow lives at [.github/workflows/deploy.yaml](C:\Users\ASUS\Projects\MARC_Website\Marc_Website_v1\MARC_Website\.github\workflows\deploy.yaml).
+
+At a high level it does the following:
+1. Checks out this repository.
+2. Removes local debug content collections.
+3. Clones `pdnMARC/marc_people` into `src/collection_people`.
+4. Clones `pdnMARC/marc_projects` into `src/collection_projects`.
+5. Clones `pdnMARC/marc_news` into `src/collection_news`.
+6. Installs Python and syncs spreadsheet-based data with `python_scripts/get_data.py`.
+7. Builds the Astro site.
+8. Deploys to GitHub Pages.
+
+This means the live site is assembled from multiple sources during deployment, rather than storing all content directly in this repository.
+
+## Content schemas
+
+The content schemas are defined in [src/content.config.ts](C:\Users\ASUS\Projects\MARC_Website\Marc_Website_v1\MARC_Website\src\content.config.ts).
+
+That file is the main place where the website defines what each collection should look like.
+
+In practice:
+- people, projects, and markdown news come from external repositories as Markdown collections
+- publications and social feed data come from JSON files generated from the Google Sheet
+
+## Local development
+
+The main JavaScript commands are:
+
+```bash
+npm install
+npm run dev
+npm run build
+npm run preview
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+This repository also includes a small Python environment for spreadsheet syncing:
 
-## 🧞 Commands
+```bash
+uv sync
+uv run python_scripts/get_data.py
+```
 
-All commands are run from the root of the project, from a terminal:
+The Python dependencies are defined in [pyproject.toml](C:\Users\ASUS\Projects\MARC_Website\Marc_Website_v1\MARC_Website\pyproject.toml) and locked in [uv.lock](C:\Users\ASUS\Projects\MARC_Website\Marc_Website_v1\MARC_Website\uv.lock).
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## What to edit, depending on the type of change
 
-## 👀 Want to learn more?
+If you want to change website structure or behavior, edit this repository.
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Examples:
+- page layout
+- components
+- navigation
+- styling
+- schema changes
+- deployment workflow
+- spreadsheet sync logic
+
+If you want to change content, usually edit one of the content repositories instead:
+- `marc_people` for people profiles
+- `marc_projects` for project entries
+- `marc_news` for Markdown news articles
+
+If you want to update publications or social feed items, use the Google Sheet rather than editing generated JSON by hand.
+
+## Useful things for contributors
+
+A few practical points:
+- changes to content repositories affect what this website shows, even if this repository itself is unchanged
+- changing a content schema here may require matching updates in the corresponding content repository
+- the generated JSON files for publications and social feed come from the Google Sheet and Python sync script, so manual edits to those generated files are usually not the source of truth
+- the deployment workflow is the place to check if content appears locally but not on the live site, or vice versa
+
+## Repository role in the larger setup
+
+A short summary of responsibilities:
+- `MARC_Website`: website code, page rendering, schemas, deployment, spreadsheet sync
+- `marc_people`: people Markdown content
+- `marc_projects`: projects Markdown content
+- `marc_news`: Markdown news content
+- Google Sheet: publications and social feed source data
+
+## Future documentation
+
+This README is intentionally high-level.
+
+More detailed technical documentation for components, layouts, and internal implementation can be added later in a dedicated `docs/` folder.
