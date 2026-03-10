@@ -1,0 +1,50 @@
+name: Prepare Site
+description: Prepare external content collections and synced spreadsheet data for the website build.
+
+runs:
+  using: composite
+  steps:
+    - name: Remove local debug collections
+      shell: bash
+      run: |
+        rm -rf src/collection_people
+        rm -rf src/collection_projects
+        rm -rf src/collection_news
+
+    - name: Clone marc_people repository
+      uses: actions/checkout@v5
+      with:
+        repository: pdnMARC/marc_people
+        path: src/collection_people
+        fetch-depth: 1
+
+    - name: Clone marc_projects repository
+      uses: actions/checkout@v5
+      with:
+        repository: pdnMARC/marc_projects
+        path: src/collection_projects
+        fetch-depth: 1
+
+    - name: Clone marc_news repository
+      uses: actions/checkout@v5
+      with:
+        repository: pdnMARC/marc_news
+        path: src/collection_news
+        fetch-depth: 1
+
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install uv
+      shell: bash
+      run: pip install uv
+
+    - name: Sync Python dependencies
+      shell: bash
+      run: uv sync --frozen
+
+    - name: Run Python scripts
+      shell: bash
+      run: uv run python_scripts/get_data.py

@@ -17,76 +17,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout main Astro repo
       - name: Checkout main repository
         uses: actions/checkout@v5
 
-      # 👇 Add the logging step here
       - name: Print trigger info
         run: echo "Triggered by ${{ github.event.client_payload.source }}"
 
-      # Remove local debug collection
-      - name: Remove local debug collections
-        run: |
-         rm -rf src/collection_people
-         rm -rf src/collection_projects
-         rm -rf src/collection_news
+      - name: Prepare site inputs
+        uses: ./.github/actions/prepare-site
 
-      # Clone marc_people into the correct location
-      - name: Clone marc_people repository
-        uses: actions/checkout@v5
-        with:
-          repository: pdnMARC/marc_people
-          path: src/collection_people
-          fetch-depth: 1
-          # If marc_people is private:
-          # token: ${{ secrets.MARC_PEOPLE_READ_TOKEN }}
-
-      # Clone marc_projects into the correct location
-      - name: Clone marc_projects repository
-        uses: actions/checkout@v5
-        with:
-          repository: pdnMARC/marc_projects
-          path: src/collection_projects
-          fetch-depth: 1
-          # If marc_people is private:
-          # token: ${{ secrets.MARC_PEOPLE_READ_TOKEN }}
-
-      # Clone marc_news into the correct location
-      - name: Clone marc_news repository
-        uses: actions/checkout@v5
-        with:
-          repository: pdnMARC/marc_news
-          path: src/collection_news
-          fetch-depth: 1
-          # If marc_news is private:
-          # token: ${{ secrets.MARC_NEWS_READ_TOKEN }}
-
-      # -----------------------------
-      # 🐍 Python Setup using uv
-      # -----------------------------
-
-      - name: Install Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        run: pip install uv
-
-      - name: Sync Python dependencies
-        run: uv sync --frozen
-
-      - name: Run Python scripts
-        run: uv run python_scripts/get_data.py 
-      
-
-      # Install, build, and upload
       - name: Install, build, and upload your site
         uses: withastro/action@v5
-        # with:
-        #   node-version: 22
-        #   package-manager: pnpm@latest
 
   deploy:
     needs: build
@@ -94,6 +35,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
