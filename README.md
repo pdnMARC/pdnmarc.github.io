@@ -11,6 +11,11 @@ The actual content is split across separate repositories:
 
 In addition, some structured data is pulled from a shared Google Sheet and converted into JSON during the build/update flow.
 
+> [!IMPORTANT]
+> A GitHub Personal Access Token (PAT) is used to connect the dependent repositories and trigger automatic website updates when one of those repositories changes.
+> The secret name used in the content repositories is `SITE_REPO_TOKEN`, and it is referenced by the trigger workflows such as [`marc_people/.github/workflows/trigger-site.yml`](https://github.com/pdnMARC/marc_people/blob/main/.github/workflows/trigger-site.yml), [`marc_projects/.github/workflows/trigger-site.yml`](https://github.com/pdnMARC/marc_projects/blob/main/.github/workflows/trigger-site.yml), and [`marc_news/.github/workflows/trigger-site.yml`](https://github.com/pdnMARC/marc_news/blob/main/.github/workflows/trigger-site.yml).
+> The current PAT has a lifetime of 366 days and should be renewed around **March 11, 2027**.
+
 ## :sparkles: Overview
 
 The website is built with:
