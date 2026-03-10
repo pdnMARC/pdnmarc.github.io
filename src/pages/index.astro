@@ -5,7 +5,7 @@ import { getCollection } from "astro:content";
 import { Image } from "astro:assets";
 import "../styles/app.css";
 import logo from "../assets/logo.png";
-import heroImage from "../assets/Home_Page_design.jpeg";
+import heroImage from "../assets/Home_page_Design.jpeg";
 
 // 1. Fetch Research Areas (Same logic as src/pages/Research/index.astro)
 const researchAreas = Object.values(
@@ -31,34 +31,63 @@ const latestNews = allNews
 
 <BaseLayout>
     <section class="relative mb-24 lg:mb-32">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
+        <div
+            class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center"
+        >
             <!-- Left Content: Text-focused and grounded -->
             <div class="lg:col-span-5 order-2 lg:order-1 relative z-10">
-                <div class="inline-flex items-center gap-2 mb-6 text-sm font-bold tracking-widest text-primary bg-primary/5 px-4 py-2 rounded-lg border border-primary/10 uppercase">
+                <div
+                    class="inline-flex items-center gap-2 mb-6 text-sm font-bold tracking-widest text-primary bg-primary/5 px-4 py-2 rounded-lg border border-primary/10 uppercase"
+                >
                     Innovation for Humanity
                 </div>
-                
-                <h1 class="text-4xl md:text-5xl font-black mb-8 leading-[1.05] tracking-tight text-gray-900">
-                    Multidisciplinary <br/>
+
+                <h1
+                    class="text-4xl md:text-5xl font-black mb-8 leading-[1.05] tracking-tight text-gray-900"
+                >
+                    Multidisciplinary <br />
                     <span class="text-primary relative inline-block">
                         AI Research Centre
-                        <span class="absolute -bottom-2 left-0 w-1/2 h-2 bg-primary rounded-full opacity-20"></span>
+                        <span
+                            class="absolute -bottom-2 left-0 w-1/2 h-2 bg-primary rounded-full opacity-20"
+                        ></span>
                     </span>
                 </h1>
-                
-                <p class="text-xl md:text-2xl mb-12 text-gray-600 leading-relaxed max-w-xl font-medium">
-                        Empowering the Future through Multidisciplinary AI Research                 </p>
-                
+
+                <p
+                    class="text-xl md:text-2xl mb-12 text-gray-600 leading-relaxed max-w-xl font-medium"
+                >
+                    Empowering the Future through Multidisciplinary AI Research
+                </p>
+
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="/Research" class="group relative px-5 py-5 bg-primary text-white rounded-2xl font-bold text-lg overflow-hidden shadow-2xl shadow-primary/30 transition-all hover:-translate-y-1">
-                        <span class="relative z-10 flex items-center justify-center gap-2">
+                    <a
+                        href="/Research"
+                        class="group relative px-5 py-5 bg-primary text-white rounded-2xl font-bold text-lg overflow-hidden shadow-2xl shadow-primary/30 transition-all hover:-translate-y-1"
+                    >
+                        <span
+                            class="relative z-10 flex items-center justify-center gap-2"
+                        >
                             Explore Research
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-5 h-5 transition-transform group-hover:translate-x-1"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                             </svg>
                         </span>
                     </a>
-                    <a href="/projects" class="px-10 py-5 bg-primary/10 text-primary border-2 border-primary/20 rounded-2xl font-bold text-lg transition-all hover:bg-primary/20 hover:border-primary/40 text-center">
+                    <a
+                        href="/projects"
+                        class="px-10 py-5 bg-primary/10 text-primary border-2 border-primary/20 rounded-2xl font-bold text-lg transition-all hover:bg-primary/20 hover:border-primary/40 text-center"
+                    >
                         View Projects
                     </a>
                 </div>
@@ -67,19 +96,27 @@ const latestNews = allNews
             <!-- Right Visual: The Humanized Context -->
             <div class="lg:col-span-7 order-1 lg:order-2 relative">
                 <!-- Decorative Frame/Shadow -->
-                <div class="absolute -inset-4 bg-gradient-to-tr from-[--color-primary]/30 to-[--color-primary]/10 rounded-[3rem] blur-2xl opacity-50 -z-10"></div>
-                
+                <div
+                    class="absolute -inset-4 bg-gradient-to-tr from-[--color-primary]/30 to-[--color-primary]/10 rounded-[3rem] blur-2xl opacity-50 -z-10"
+                >
+                </div>
+
                 <!-- Main Image Container -->
-                <div class="relative rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white group">
-                    <Image 
-                        src={heroImage} 
-                        alt="AI Research Center - Human Context" 
+                <div
+                    class="relative rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white group"
+                >
+                    <Image
+                        src={heroImage}
+                        alt="AI Research Center - Human Context"
                         class="w-full h-auto object-cover transform transition-transform duration-[2s] group-hover:scale-105"
                     />
                 </div>
 
                 <!-- Abstract "Human Connection" element -->
-                <div class="absolute -top-10 -right-10 w-32 h-32 bg-[--color-primary] rounded-full blur-[60px] opacity-20 hidden lg:block animate-pulse"></div>
+                <div
+                    class="absolute -top-10 -right-10 w-32 h-32 bg-[--color-primary] rounded-full blur-[60px] opacity-20 hidden lg:block animate-pulse"
+                >
+                </div>
             </div>
         </div>
     </section>
@@ -106,7 +143,9 @@ const latestNews = allNews
     <section class="mb-12">
         <div class="flex justify-between items-end mb-8">
             <h2 class="text-3xl font-bold text-gray-900">Latest News</h2>
-            <a href="/news" class="link link-primary font-bold">View All News →</a>
+            <a href="/news" class="link link-primary font-bold"
+                >View All News →</a
+            >
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -132,7 +171,9 @@ const latestNews = allNews
                                     new Date(
                                         Date.now() - 30 * 24 * 60 * 60 * 1000,
                                     ) && (
-                                    <div class="badge bg-[--color-primary] border-none text-white font-bold">NEW</div>
+                                    <div class="badge bg-[--color-primary] border-none text-white font-bold">
+                                        NEW
+                                    </div>
                                 )}
                             </h3>
                             <p class="text-sm text-gray-500 mb-2 font-medium">
