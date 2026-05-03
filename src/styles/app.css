@@ -3,12 +3,206 @@
 @plugin "@tailwindcss/typography";
 
 @plugin "daisyui" {
-    themes: winter --default;
+    themes: marc --default, marc-dark --prefersdark;
 }
 
+/* ──────────────────────────────────────────────────────────────
+   MARC light theme — editorial, DeepMind-inspired
+   ────────────────────────────────────────────────────────────── */
 @plugin "daisyui/theme" {
-    name: "winter";
+    name: "marc";
     default: true;
+    color-scheme: light;
+
+    --color-base-100: #ffffff;
+    --color-base-200: #f6f7f9;
+    --color-base-300: #eceef2;
+    --color-base-content: #0b1220;
+
     --color-primary: #06A3DA;
     --color-primary-content: #ffffff;
+
+    --color-secondary: #0B1220;
+    --color-secondary-content: #ffffff;
+
+    --color-accent: #7C3AED;
+    --color-accent-content: #ffffff;
+
+    --color-neutral: #1a2332;
+    --color-neutral-content: #ffffff;
+
+    --color-info: #06A3DA;
+    --color-success: #16a34a;
+    --color-warning: #d97706;
+    --color-error: #dc2626;
+
+    --radius-selector: 0.75rem;
+    --radius-field: 0.625rem;
+    --radius-box: 1rem;
+
+    --border: 1px;
+    --depth: 0;
+    --noise: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   MARC dark theme
+   ────────────────────────────────────────────────────────────── */
+@plugin "daisyui/theme" {
+    name: "marc-dark";
+    color-scheme: dark;
+
+    --color-base-100: #0b1220;
+    --color-base-200: #111a2e;
+    --color-base-300: #1a2440;
+    --color-base-content: #e6ecf5;
+
+    --color-primary: #38bdf8;
+    --color-primary-content: #08131f;
+
+    --color-secondary: #f5f6fa;
+    --color-secondary-content: #0b1220;
+
+    --color-accent: #a78bfa;
+    --color-accent-content: #1a1033;
+
+    --color-neutral: #e6ecf5;
+    --color-neutral-content: #0b1220;
+
+    --radius-selector: 0.75rem;
+    --radius-field: 0.625rem;
+    --radius-box: 1rem;
+
+    --border: 1px;
+    --depth: 0;
+    --noise: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Typography — Inter (sans) + Instrument Serif (display)
+   ────────────────────────────────────────────────────────────── */
+@theme {
+    --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+        Roboto, sans-serif;
+    --font-serif: "Instrument Serif", "Times New Roman", serif;
+}
+
+html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    background: var(--color-base-100);
+    color: var(--color-base-content);
+}
+
+/* Display headings — editorial serif */
+.font-display {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.02;
+}
+
+/* Eyebrow label */
+.eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-base-content);
+    opacity: 0.7;
+}
+
+/* Gradient text accent */
+.text-gradient {
+    background-image: linear-gradient(
+        110deg,
+        var(--color-primary) 0%,
+        var(--color-accent) 60%,
+        #ec4899 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Soft surface hover */
+.surface-hover {
+    transition:
+        transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+        box-shadow 0.4s ease,
+        border-color 0.3s ease;
+}
+.surface-hover:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 12px 32px -12px rgba(11, 18, 32, 0.18),
+        0 2px 6px -2px rgba(11, 18, 32, 0.08);
+}
+
+/* Subtle grid background */
+.bg-grid {
+    background-image:
+        linear-gradient(to right, rgba(11, 18, 32, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(11, 18, 32, 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+}
+[data-theme="marc-dark"] .bg-grid {
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+/* Glow blob */
+.blob {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(72px);
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Accessible focus ring */
+:where(a, button, input, select, textarea):focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+    }
+}
+
+/* Marquee / horizontal scroll snap rail */
+.scroll-rail {
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+.scroll-rail::-webkit-scrollbar {
+    display: none;
+}
+.scroll-rail > * {
+    scroll-snap-align: start;
+}
+
+/* Section divider */
+.divider-soft {
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(
+        to right,
+        transparent,
+        color-mix(in srgb, var(--color-base-content) 18%, transparent),
+        transparent
+    );
 }
