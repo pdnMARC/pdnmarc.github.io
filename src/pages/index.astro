@@ -1,198 +1,270 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ResearchAreaCard from "../components/ResearchAreaCard.astro";
+import Section from "../components/ui/Section.astro";
 import { getCollection } from "astro:content";
 import { Image } from "astro:assets";
-import "../styles/app.css";
-import logo from "../assets/logo.png";
 import heroImage from "../assets/Home_page_Design.jpeg";
 
-// 1. Fetch Research Areas (Same logic as src/pages/Research/index.astro)
 const researchAreas = Object.values(
     import.meta.glob("./Research/*.md", { eager: true }),
 );
 
-// Helper to resolve images for Research Areas (which use string paths in frontmatter)
 const researchImages = import.meta.glob<{ default: ImageMetadata }>(
     "/src/assets/*.{jpeg,jpg,png,gif}",
     { eager: true },
 );
-const getResearchImage = (filename: string) => {
-    return researchImages[`/src/assets/${filename}`]?.default;
-};
+const getResearchImage = (filename: string) =>
+    researchImages[`/src/assets/${filename}`]?.default;
 
-// 2. Fetch Latest News
 const allNews = await getCollection("news");
-// Sort by date descending and take the top 3
 const latestNews = allNews
     .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-    .slice(0, 3);
+    .slice(0, 4);
+
+const allProjects = await getCollection("projects");
+const allPubs = await getCollection("publications");
+const allPeople = await getCollection("people");
+
+const stats = [
+    { label: "Research areas", value: researchAreas.length },
+    { label: "Active projects", value: allProjects.length },
+    { label: "Publications", value: allPubs.length },
+    { label: "Researchers", value: allPeople.length },
+];
 ---
 
-<BaseLayout>
-    <section class="relative mb-24 lg:mb-32">
+<BaseLayout
+    title="Multidisciplinary AI Research Centre"
+    description="MARC advances multidisciplinary AI research at the Faculty of Engineering, University of Peradeniya — across computer vision, generative AI, biomedical, smart grid, MSI and socioeconomic systems."
+    fullWidth={true}
+>
+    <!-- ─────────────────────────────  HERO  ───────────────────────────── -->
+    <section class="relative overflow-hidden bg-base-100">
+        <div class="bg-grid absolute inset-0 opacity-60"></div>
         <div
-            class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center"
+            class="blob bg-primary -top-32 -left-32 w-[36rem] h-[36rem]"
+        ></div>
+        <div
+            class="blob bg-accent top-40 -right-24 w-[28rem] h-[28rem] opacity-25"
+        ></div>
+
+        <div
+            class="relative container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 lg:pt-32 pb-24 lg:pb-40"
         >
-            <!-- Left Content: Text-focused and grounded -->
-            <div class="lg:col-span-5 order-2 lg:order-1 relative z-10">
-                <div
-                    class="inline-flex items-center gap-2 mb-6 text-sm font-bold tracking-widest text-primary bg-primary/5 px-4 py-2 rounded-lg border border-primary/10 uppercase"
-                >
-                    Innovation for Humanity
-                </div>
+            <p class="eyebrow text-primary mb-6">
+                University of Peradeniya · Faculty of Engineering
+            </p>
 
-                <h1
-                    class="text-4xl md:text-5xl font-black mb-8 leading-[1.05] tracking-tight text-gray-900"
-                >
-                    Multidisciplinary <br />
-                    <span class="text-primary relative inline-block">
-                        AI Research Centre
-                        <span
-                            class="absolute -bottom-2 left-0 w-1/2 h-2 bg-primary rounded-full opacity-20"
-                        ></span>
-                    </span>
-                </h1>
+            <h1
+                class="font-display text-[3.25rem] sm:text-7xl lg:text-[6.5rem] leading-[0.95] tracking-tight max-w-5xl"
+            >
+                Multidisciplinary
+                <em class="not-italic text-gradient">AI research</em>
+                for a human future.
+            </h1>
 
-                <p
-                    class="text-xl md:text-2xl mb-12 text-gray-600 leading-relaxed max-w-xl font-medium"
-                >
-                    Empowering the Future through Multidisciplinary AI Research
-                </p>
+            <p
+                class="mt-10 max-w-2xl text-lg md:text-xl text-base-content/70 leading-relaxed"
+            >
+                MARC brings together engineers, scientists and clinicians to
+                build AI systems that are useful, trustworthy, and grounded in
+                real-world problems — from healthcare to smart grids.
+            </p>
 
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <a
-                        href="/Research"
-                        class="group relative px-5 py-5 bg-primary text-white rounded-2xl font-bold text-lg overflow-hidden shadow-2xl shadow-primary/30 transition-all hover:-translate-y-1"
+            <div class="mt-12 flex flex-wrap items-center gap-4">
+                <a
+                    href="/Research"
+                    class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-secondary text-secondary-content text-sm font-medium hover:opacity-90 transition"
+                >
+                    Explore research
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
                     >
-                        <span
-                            class="relative z-10 flex items-center justify-center gap-2"
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M5 12h14M13 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+                <a
+                    href="/projects"
+                    class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-base-200 text-base-content text-sm font-medium hover:bg-base-300 transition"
+                >
+                    View projects
+                </a>
+            </div>
+
+            <!-- Hero visual -->
+            <div class="relative mt-20 lg:mt-28 rounded-3xl overflow-hidden">
+                <Image
+                    src={heroImage}
+                    alt="MARC research"
+                    class="w-full h-[28rem] lg:h-[34rem] object-cover"
+                    loading="eager"
+                />
+                <div
+                    class="absolute inset-x-0 bottom-0 p-8 lg:p-12 bg-gradient-to-t from-secondary/90 via-secondary/40 to-transparent text-white"
+                >
+                    <p class="eyebrow opacity-80 mb-2">Featured</p>
+                    <p
+                        class="font-display text-2xl md:text-3xl lg:text-4xl max-w-2xl leading-tight"
+                    >
+                        Building AI that serves people, science, and society.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─────────────────────────────  STATS  ───────────────────────────── -->
+    <section class="border-y border-base-200 bg-base-200/50">
+        <div
+            class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 lg:py-16"
+        >
+            <div
+                class="grid grid-cols-2 md:grid-cols-4 gap-8 divide-y md:divide-y-0 md:divide-x divide-base-300"
+            >
+                {
+                    stats.map((s) => (
+                        <div class="px-6 py-4 md:py-0 first:pt-0">
+                            <div class="font-display text-5xl md:text-6xl text-base-content">
+                                {s.value}
+                            </div>
+                            <div class="mt-2 text-sm text-base-content/60">
+                                {s.label}
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- ─────────────────────────────  RESEARCH PILLARS  ───────────────────────────── -->
+    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <Section
+            eyebrow="Research"
+            title="Six pillars, one shared mission"
+            description="Our work spans foundational AI and applied research across critical domains where intelligence meets impact."
+            cta={{ href: "/Research", label: "All research areas" }}
+        >
+            <div
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+            >
+                {
+                    researchAreas.map((Area: any) => (
+                        <ResearchAreaCard
+                            Area={Area.frontmatter.title}
+                            ImageUrl={getResearchImage(
+                                Area.frontmatter.coverImage,
+                            )}
+                            PageLink={Area.url}
                         >
-                            Explore Research
+                            {Area.frontmatter.short}
+                        </ResearchAreaCard>
+                    ))
+                }
+            </div>
+        </Section>
+
+        <!-- ─────────────────────────────  LATEST NEWS  ───────────────────────────── -->
+        <Section
+            eyebrow="The latest"
+            title="News & milestones"
+            description="Awards, papers, talks and stories from the lab."
+            cta={{ href: "/news", label: "All news" }}
+        >
+            <div
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            >
+                {
+                    latestNews.map((newsItem) => (
+                        <a
+                            href={`/news/${newsItem.id}`}
+                            class="group surface-hover flex flex-col rounded-2xl bg-base-100 border border-base-200 overflow-hidden h-full"
+                        >
+                            <div class="aspect-[4/3] overflow-hidden bg-base-200">
+                                {newsItem.data.cover && (
+                                    <Image
+                                        src={newsItem.data.cover}
+                                        alt={newsItem.data.title}
+                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                    />
+                                )}
+                            </div>
+                            <div class="p-5 flex flex-col flex-grow">
+                                <p class="text-xs text-base-content/50 mb-2">
+                                    {newsItem.data.date.toLocaleDateString(
+                                        "en-US",
+                                        {
+                                            year: "numeric",
+                                            month: "short",
+                                            day: "numeric",
+                                        },
+                                    )}
+                                </p>
+                                <h3 class="font-medium text-base leading-snug group-hover:text-primary transition-colors mb-2">
+                                    {newsItem.data.title}
+                                </h3>
+                                <p class="text-sm text-base-content/60 line-clamp-2 mt-auto">
+                                    {newsItem.data.short}
+                                </p>
+                            </div>
+                        </a>
+                    ))
+                }
+            </div>
+        </Section>
+
+        <!-- ─────────────────────────────  CTA STRIP  ───────────────────────────── -->
+        <section class="pb-24 lg:pb-32">
+            <div
+                class="relative overflow-hidden rounded-3xl bg-secondary text-secondary-content p-10 md:p-16"
+            >
+                <div
+                    class="blob bg-primary -top-20 -right-10 w-96 h-96 opacity-30"
+                ></div>
+                <div
+                    class="blob bg-accent -bottom-20 -left-10 w-96 h-96 opacity-25"
+                ></div>
+                <div class="relative grid md:grid-cols-3 gap-8 items-end">
+                    <div class="md:col-span-2">
+                        <p class="eyebrow opacity-70 mb-4">Get involved</p>
+                        <h2
+                            class="font-display text-4xl md:text-5xl leading-tight"
+                        >
+                            Collaborate, research, or join the team.
+                        </h2>
+                    </div>
+                    <div class="flex md:justify-end">
+                        <a
+                            href="/people"
+                            class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-white text-secondary text-sm font-medium hover:opacity-90 transition"
+                        >
+                            Meet our people
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                class="w-5 h-5 transition-transform group-hover:translate-x-1"
+                                class="w-4 h-4"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
+                                stroke-width="2"
                             >
                                 <path
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                    d="M5 12h14M13 5l7 7-7 7"></path>
                             </svg>
-                        </span>
-                    </a>
-                    <a
-                        href="/projects"
-                        class="px-10 py-5 bg-primary/10 text-primary border-2 border-primary/20 rounded-2xl font-bold text-lg transition-all hover:bg-primary/20 hover:border-primary/40 text-center"
-                    >
-                        View Projects
-                    </a>
+                        </a>
+                    </div>
                 </div>
             </div>
-
-            <!-- Right Visual: The Humanized Context -->
-            <div class="lg:col-span-7 order-1 lg:order-2 relative">
-                <!-- Decorative Frame/Shadow -->
-                <div
-                    class="absolute -inset-4 bg-gradient-to-tr from-[--color-primary]/30 to-[--color-primary]/10 rounded-[3rem] blur-2xl opacity-50 -z-10"
-                >
-                </div>
-
-                <!-- Main Image Container -->
-                <div
-                    class="relative rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white group"
-                >
-                    <Image
-                        src={heroImage}
-                        alt="AI Research Center - Human Context"
-                        class="w-full h-auto object-cover transform transition-transform duration-[2s] group-hover:scale-105"
-                    />
-                </div>
-
-                <!-- Abstract "Human Connection" element -->
-                <div
-                    class="absolute -top-10 -right-10 w-32 h-32 bg-[--color-primary] rounded-full blur-[60px] opacity-20 hidden lg:block animate-pulse"
-                >
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="mb-16">
-        <h2 class="text-3xl font-bold mb-8 text-center text-gray-900">
-            Our Research Pillars
-        </h2>
-        <div class="flex flex-col gap-8">
-            {
-                researchAreas.map((Area: any) => (
-                    <ResearchAreaCard
-                        Area={Area.frontmatter.title}
-                        ImageUrl={getResearchImage(Area.frontmatter.coverImage)}
-                        PageLink={Area.url}
-                    >
-                        {Area.frontmatter.short}
-                    </ResearchAreaCard>
-                ))
-            }
-        </div>
-    </section>
-
-    <section class="mb-12">
-        <div class="flex justify-between items-end mb-8">
-            <h2 class="text-3xl font-bold text-gray-900">Latest News</h2>
-            <a href="/news" class="link link-primary font-bold"
-                >View All News →</a
-            >
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {
-                latestNews.map((newsItem) => (
-                    <a
-                        href={`/news/${newsItem.id}`}
-                        class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 rounded-3xl border border-gray-100"
-                    >
-                        <figure class="px-4 pt-4">
-                            {newsItem.data.cover && (
-                                <Image
-                                    src={newsItem.data.cover}
-                                    alt={newsItem.data.title}
-                                    class="rounded-2xl h-48 w-full object-cover"
-                                />
-                            )}
-                        </figure>
-                        <div class="card-body">
-                            <h3 class="card-title text-lg text-gray-900 font-bold">
-                                {newsItem.data.title}
-                                {new Date(newsItem.data.date) >
-                                    new Date(
-                                        Date.now() - 30 * 24 * 60 * 60 * 1000,
-                                    ) && (
-                                    <div class="badge bg-[--color-primary] border-none text-white font-bold">
-                                        NEW
-                                    </div>
-                                )}
-                            </h3>
-                            <p class="text-sm text-gray-500 mb-2 font-medium">
-                                {newsItem.data.date.toLocaleDateString(
-                                    "en-US",
-                                    {
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                    },
-                                )}
-                            </p>
-                            <p class="line-clamp-3 text-sm text-gray-600 leading-relaxed">
-                                {newsItem.data.short}
-                            </p>
-                        </div>
-                    </a>
-                ))
-            }
-        </div>
-    </section>
+        </section>
+    </div>
 </BaseLayout>

@@ -1,25 +1,88 @@
 ---
 import "../styles/app.css";
 import Navbar from "../components/Navbar.astro";
-import Footer from "../components/Footer.astro"; // Import the new component
+import Footer from "../components/Footer.astro";
+
+interface Props {
+    title?: string;
+    description?: string;
+    image?: string;
+    fullWidth?: boolean;
+}
+
+const {
+    title = "Multidisciplinary AI Research Centre",
+    description = "MARC — Multidisciplinary AI Research Centre at the Faculty of Engineering, University of Peradeniya. Empowering the future through interdisciplinary AI research.",
+    image = "/og-default.png",
+    fullWidth = false,
+} = Astro.props;
+
+const fullTitle =
+    title === "Multidisciplinary AI Research Centre"
+        ? title
+        : `${title} — MARC`;
+const canonical = Astro.url.href;
 ---
 
-<html lang="en">
+<!doctype html>
+<html lang="en" data-theme="marc">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+
+        <!-- Open Graph / Twitter -->
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={fullTitle} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={image} />
+        <meta name="twitter:card" content="summary_large_image" />
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
-            rel="stylesheet"
-            href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css"
+            rel="preconnect"
+            href="https://fonts.gstatic.com"
+            crossorigin
         />
-        <title>MARC</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap"
+            rel="stylesheet"
+        />
+
+        <title>{fullTitle}</title>
+
+        <!-- Theme bootstrap (avoids dark-mode flash) -->
+        <script is:inline>
+            (() => {
+                try {
+                    const stored = localStorage.getItem("marc-theme");
+                    const prefersDark = window.matchMedia(
+                        "(prefers-color-scheme: dark)"
+                    ).matches;
+                    const theme =
+                        stored || (prefersDark ? "marc-dark" : "marc");
+                    document.documentElement.setAttribute("data-theme", theme);
+                } catch (_) {}
+            })();
+        </script>
     </head>
-    <body class="flex flex-col min-h-screen">
+    <body class="flex flex-col min-h-screen bg-base-100 text-base-content">
         <Navbar />
 
-        <div class="container mx-auto px-4 py-12 max-w-6xl flex-grow">
-            <slot />
-        </div>
+        <main class={fullWidth ? "flex-grow" : "flex-grow"}>
+            {
+                fullWidth ? (
+                    <slot />
+                ) : (
+                    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-12 lg:py-20">
+                        <slot />
+                    </div>
+                )
+            }
+        </main>
 
         <Footer />
     </body>

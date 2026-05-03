@@ -1,19 +1,55 @@
 ---
-import "../styles/app.css";
+import { Image } from "astro:assets";
 const { Area, ImageUrl, PageLink } = Astro.props;
 ---
 
-<div class="card lg:card-side bg-base-100 shadow-xl">
-    <figure class="w-full lg:w-72 lg:h-72 shrink-0">
-        <img src={ImageUrl.src} alt="Album" />
-    </figure>
-    <div class="card-body">
-        <h2 class="card-title">{Area}</h2>
-        <p>
-            <slot />
-        </p>
-        <div class="card-actions justify-end">
-            <a href={PageLink} class="btn btn-primary">Read More</a>
+<a
+    href={PageLink}
+    class="group surface-hover relative flex flex-col overflow-hidden rounded-2xl bg-base-100 border border-base-200 h-full"
+>
+    <div class="relative aspect-[4/3] overflow-hidden bg-base-200">
+        {
+            ImageUrl && (
+                <Image
+                    src={ImageUrl}
+                    alt={Area}
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+            )
+        }
+        <div
+            class="absolute inset-0 bg-gradient-to-t from-secondary/70 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"
+        >
+        </div>
+        <div
+            class="absolute bottom-4 left-4 right-4 text-white"
+        >
+            <h3 class="font-display text-2xl md:text-3xl leading-tight">
+                {Area}
+            </h3>
         </div>
     </div>
-</div>
+    <div class="p-6 flex flex-col flex-grow">
+        <p class="text-sm text-base-content/70 leading-relaxed flex-grow">
+            <slot />
+        </p>
+        <span
+            class="mt-5 inline-flex items-center gap-2 text-sm font-medium text-primary"
+        >
+            Explore area
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-4 h-4 transition-transform group-hover:translate-x-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 12h14M13 5l7 7-7 7"></path>
+            </svg>
+        </span>
+    </div>
+</a>

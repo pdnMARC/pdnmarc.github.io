@@ -1,11 +1,25 @@
 ---
-import "../styles/app.css";
-
-const { path } = Astro.props;
 ---
 
-<div class="text-md breadcrumbs mb-6 text-base-content/70">
-    <ul>
+<nav
+    class="text-xs uppercase tracking-widest text-base-content/50 mb-10"
+    aria-label="Breadcrumb"
+>
+    <ul class="flex flex-wrap items-center gap-2">
         <slot />
     </ul>
-</div>
+</nav>
+
+<style>
+    nav :global(li + li)::before {
+        content: "›";
+        margin-right: 0.5rem;
+        opacity: 0.5;
+    }
+    nav :global(a) {
+        transition: color 0.2s ease;
+    }
+    nav :global(a:hover) {
+        color: var(--color-primary);
+    }
+</style>
