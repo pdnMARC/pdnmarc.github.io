@@ -1,0 +1,21 @@
+---
+// Markdown body wrapper. Loads the KaTeX stylesheet (rehype-katex output, spec B9)
+// only on pages that actually render Markdown.
+import "katex/dist/katex.min.css";
+
+interface Props {
+    class?: string;
+    size?: "base" | "lg";
+}
+const { class: className, size = "lg" } = Astro.props;
+---
+
+<div
+    class:list={[
+        "prose max-w-none prose-img:rounded-2xl prose-a:underline-offset-2 prose-headings:font-extrabold",
+        size === "lg" && "prose-lg",
+        className,
+    ]}
+>
+    <slot />
+</div>

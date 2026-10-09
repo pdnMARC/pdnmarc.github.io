@@ -1,5 +1,4 @@
 ---
-layout: ../../layouts/ResearchArea.astro
 title: Multispectral Imaging
 coverImage: MSI.png
 short: >

@@ -1,215 +1,140 @@
 ---
 import { getCollection } from "astro:content";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import Breadcrumb from "../../components/Breadcrumb.astro";
 import { Image } from "astro:assets";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Icon from "../../components/ui/Icon.astro";
 
-// --- LOGIC (Unchanged) ---
-// Fetch and sort by newest first
-const social_newsItems = await getCollection("social_news");
-const sortedNewssocial = social_newsItems.sort(
-    (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
-);
+const byDateDesc = (a: { date: string | Date }, b: { date: string | Date }) =>
+    new Date(b.date).getTime() - new Date(a.date).getTime();
 
-// Helper to get icon based on source
-const getIconClass = (source: string) => {
-    if (source === "LinkedIn") return "text-[#0077b5]"; // Official LinkedIn Blue
-    if (source === "Facebook") return "text-[#1877F2]"; // Official FB Blue
-    return "text-base-content";
+const articles = (await getCollection("news")).sort((a, b) => byDateDesc(a.data, b.data));
+const social = (await getCollection("social_news")).sort((a, b) => byDateDesc(a.data, b.data));
+
+const sourceIcon: Record<string, string> = {
+    Facebook: "mdi:facebook",
+    LinkedIn: "mdi:linkedin",
+    Twitter: "mdi:twitter",
+    Web: "material-symbols:language",
 };
-
-// 1. Fetch News
-const allNews = await getCollection("news");
-
-// 2. Sort by Date (Newest first)
-const sortedNews = allNews.sort(
-    (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
-);
+const fmt = (d: string | Date, opts: Intl.DateTimeFormatOptions) => new Date(d).toLocaleDateString("en-GB", opts);
 ---
 
-<BaseLayout>
-    <div class="max-w-6xl mx-auto px-4 py-8">
-        <Breadcrumb>
-            <li><a href="/">Home</a></li>
-            <li>News</li>
-        </Breadcrumb>
-
-        <div class="text-center mb-16">
-            <h1 class="text-5xl font-bold mb-4 text-primary">
-                Lab News & Updates
-            </h1>
-            <p class="text-xl text-base-content/70 max-w-2xl mx-auto">
-                Discover our latest research milestones, awards, and community
-                activities.
-            </p>
+<BaseLayout
+    title="News"
+    description="News, milestones and activity from the Multidisciplinary AI Research Centre, University of Peradeniya."
+    breadcrumbs={[{ label: "News" }]}
+    header={{
+        eyebrow: "Latest News",
+        title: "Research in Motion",
+        subtitle:
+            "The latest developments, research activities, events, achievements, collaborations and milestones from the Multidisciplinary AI Research Centre.",
+    }}
+>
+    <section aria-labelledby="stories">
+        <div class="mb-8 flex items-center gap-4">
+            <h2 id="stories" class="text-h3 shrink-0">Featured stories</h2>
+            <div class="divider-soft"></div>
         </div>
-
-        {/* --- SECTION 1: FEATURED STORIES (Markdown Articles) --- */}
-        <section class="mb-20">
-            <div class="flex items-center gap-4 mb-8">
-                <h2 class="text-3xl font-bold text-base-content">
-                    Featured Stories
-                </h2>
-                <div class="h-px bg-base-300 flex-grow"></div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {
-                    sortedNews.map((item) => (
-                        <a
-                            href={`/news/${item.id}`}
-                            class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-2xl hover:-translate-y-1 hover:border-primary transition-all duration-300 group flex flex-col h-full"
-                        >
-                            {/* Cover Image Wrapper */}
-                            <figure class="aspect-video relative overflow-hidden bg-base-200">
+        <ul class="grid grid-cols-1 gap-6 md:grid-cols-2 nav:grid-cols-3 lg:gap-8">
+            {
+                articles.map((item) => (
+                    <li>
+                        <a href={`/news/${item.id}/`} class="news-card group card-surface surface-hover">
+                            <div class="news-card__media">
                                 {item.data.cover ? (
                                     <Image
                                         src={item.data.cover}
-                                        alt={item.data.title}
-                                        width={600}
-                                        height={340}
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        alt=""
+                                        widths={[400, 640, 800]}
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1080px) 50vw, 400px"
+                                        class="news-card__img"
                                     />
                                 ) : (
-                                    <div class="w-full h-full flex items-center justify-center bg-base-200 text-base-content/20">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.5"
-                                            stroke="currentColor"
-                                            class="w-16 h-16"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
-                                            />
-                                        </svg>
+                                    <div class="grid h-full place-items-center text-muted">
+                                        <Icon name="material-symbols:newspaper" class="h-12 w-12 opacity-40" />
                                     </div>
                                 )}
-
-                                {/* Floating Date Badge */}
-                                <div class="absolute top-3 right-3">
-                                    <span class="badge bg-base-100/90 backdrop-blur-md shadow-sm font-mono text-xs font-bold py-3 border-0">
-                                        {item.data.date.toLocaleDateString(
-                                            "en-GB",
-                                            {
-                                                day: "numeric",
-                                                month: "short",
-                                                year: "numeric",
-                                            },
-                                        )}
-                                    </span>
-                                </div>
-                            </figure>
-
-                            {/* Card Content */}
-                            <div class="card-body p-6 flex flex-col flex-grow">
-                                <h3 class="card-title text-xl font-bold mb-3 group-hover:text-primary transition-colors leading-tight">
-                                    {item.data.title}
-                                </h3>
-                                <p class="text-sm text-base-content/70 line-clamp-3 mb-4 flex-grow">
-                                    {item.data.short}
-                                </p>
-                                <div class="card-actions justify-end mt-auto">
-                                    <span class="text-xs font-bold text-primary flex items-center gap-1 group-hover:underline">
-                                        Read Article
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            class="w-4 h-4"
-                                        >
-                                            <path
-                                                fill-rule="evenodd"
-                                                d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.5a.75.75 0 010 1.08l-5.5 5.5a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z"
-                                                clip-rule="evenodd"
-                                            />
-                                        </svg>
-                                    </span>
-                                </div>
+                            </div>
+                            <div class="flex flex-grow flex-col p-6">
+                                <time datetime={item.data.date.toISOString().slice(0, 10)} class="text-xs font-bold uppercase tracking-wider text-muted">
+                                    {fmt(item.data.date, { day: "numeric", month: "long", year: "numeric" })}
+                                </time>
+                                <h3 class="text-h4 mt-2 transition-colors group-hover:text-primary">{item.data.title}</h3>
+                                <p class="mt-3 line-clamp-3 text-[0.95rem]">{item.data.short}</p>
+                                <span class="link-arrow mt-auto pt-5">
+                                    Read story <Icon name="material-symbols:arrow-forward" />
+                                </span>
                             </div>
                         </a>
-                    ))
-                }
-            </div>
-        </section>
+                    </li>
+                ))
+            }
+        </ul>
+    </section>
 
-        {/* --- SECTION 2: SOCIAL FEED (External Links) --- */}
-        <section class="max-w-4xl mx-auto">
-            <div class="text-center mb-10">
-                <div class="badge badge-primary badge-outline mb-2">
-                    Social Feed
+    {
+        social.length > 0 && (
+            <section class="mx-auto mt-20 max-w-4xl lg:mt-28" aria-labelledby="social">
+                <div class="mb-8 text-center">
+                    <p class="eyebrow eyebrow--center">Social feed</p>
+                    <h2 id="social" class="text-h3 mt-3">Latest activity</h2>
+                    <p class="mt-2 text-muted">Updates from MARC's official channels.</p>
                 </div>
-                <h2 class="text-3xl font-bold">Latest Activity</h2>
-                <p class="text-base-content/60 mt-2">
-                    Updates directly from our social media channels.
-                </p>
-            </div>
-
-            <div class="flex flex-col gap-4">
-                {
-                    sortedNewssocial.map((item) => (
-                        <a
-                            href={item.data.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="card card-side bg-base-100 shadow-sm border border-base-200 hover:border-primary hover:shadow-md transition-all duration-200 group p-2 md:p-4 items-center"
-                        >
-                            {/* Date Box (Left Side) */}
-                            <div class="hidden md:flex flex-col items-center justify-center w-20 h-20 bg-base-200/50 rounded-xl text-center shrink-0 ml-2">
-                                <span class="text-2xl font-black text-primary">
-                                    {new Date(item.data.date).getDate()}
-                                </span>
-                                <span class="text-xs uppercase font-bold text-base-content/50">
-                                    {new Date(item.data.date).toLocaleString(
-                                        "default",
-                                        { month: "short" },
-                                    )}
-                                </span>
-                            </div>
-
-                            {/* Content Body */}
-                            <div class="card-body py-2 px-4 md:px-6 w-full">
-                                <div class="flex items-center gap-2 mb-1">
-                                    {/* Dynamic Icon Color */}
-                                    <span
-                                        class={`text-xs font-bold uppercase tracking-wider flex items-center gap-1 ${getIconClass(item.data.source)}`}
-                                    >
-                                        {/* Icon SVG */}
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            class="w-4 h-4"
-                                        >
-                                            <path d="M12.232 4.232a2.5 2.5 0 013.536 3.536l-1.225 1.224a.75.75 0 001.061 1.06l1.224-1.224a4 4 0 00-5.656-5.656l-3 3a4 4 0 00.225 5.865.75.75 0 00.977-1.138 2.5 2.5 0 01-.142-3.667l3-3z" />
-                                            <path d="M11.603 7.96a.75.75 0 00-.977 1.138 2.5 2.5 0 01.142 3.667l-3 3a2.5 2.5 0 01-3.536-3.536l1.225-1.224a.75.75 0 00-1.061-1.06l-1.224 1.224a4 4 0 105.656 5.656l3-3a4 4 0 00-.225-5.865z" />
-                                        </svg>
-                                        {item.data.source}
-                                    </span>
-                                    <span class="text-xs text-base-content/40 md:hidden">
-                                        •{" "}
-                                        {new Date(
-                                            item.data.date,
-                                        ).toLocaleDateString()}
-                                    </span>
+                <ul class="flex flex-col gap-4">
+                    {social.map((item) => (
+                        <li>
+                            <a
+                                href={item.data.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="group card-surface surface-hover flex items-center gap-5 p-4 md:p-5"
+                            >
+                                <div class="hidden h-20 w-20 shrink-0 flex-col items-center justify-center rounded-2xl bg-soft text-center md:flex">
+                                    <span class="font-head text-2xl font-extrabold text-primary">{new Date(item.data.date).getDate()}</span>
+                                    <span class="text-xs font-bold uppercase text-muted">{fmt(item.data.date, { month: "short" })}</span>
                                 </div>
-
-                                <h3 class="text-lg font-bold group-hover:text-primary transition-colors">
-                                    {item.data.title}
-                                </h3>
-
-                                <p class="text-xs text-base-content/50 mt-1 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
-                                    View original post{" "}
-                                    <span aria-hidden="true">&rarr;</span>
-                                </p>
-                            </div>
-                        </a>
-                    ))
-                }
-            </div>
-        </section>
-    </div>
+                                <div class="min-w-0">
+                                    <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-heading">
+                                        <Icon name={sourceIcon[item.data.source] ?? "material-symbols:language"} class="h-4 w-4" />
+                                        {item.data.source}
+                                        <span class="font-normal normal-case tracking-normal text-muted md:hidden">
+                                            · {fmt(item.data.date, { day: "numeric", month: "short", year: "numeric" })}
+                                        </span>
+                                    </p>
+                                    <h3 class="text-h4 mt-1 transition-colors group-hover:text-primary">{item.data.title}</h3>
+                                    <p class="mt-1 inline-flex items-center gap-1 text-sm text-muted">
+                                        View original post <Icon name="material-symbols:arrow-outward" class="h-4 w-4" />
+                                        <span class="sr-only"> (opens in a new tab)</span>
+                                    </p>
+                                </div>
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            </section>
+        )
+    }
 </BaseLayout>
+
+<style>
+    .news-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+    }
+    .news-card__media {
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        background: var(--color-soft-2);
+    }
+    .news-card :global(.news-card__img) {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform var(--t-slow) var(--ease-out-expo);
+    }
+    .news-card:hover :global(.news-card__img) {
+        transform: scale(1.055);
+    }
+</style>

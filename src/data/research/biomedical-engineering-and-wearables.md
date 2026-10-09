@@ -1,5 +1,4 @@
 ---
-layout: ../../layouts/ResearchArea.astro
 title: Biomedical Engineering and Wearables
 coverImage: BioMedical.png
 short: >

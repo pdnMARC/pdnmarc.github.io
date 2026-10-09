@@ -1,5 +1,4 @@
 ---
-layout: ../../layouts/ResearchArea.astro
 title: Generative AI
 coverImage: Gen_AI_Cover.jpg
 short: >

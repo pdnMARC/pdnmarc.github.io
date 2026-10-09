@@ -1,0 +1,24 @@
+---
+// 3px reading-progress bar (spec §6.4), solid MARC blue. Driven by chrome.ts.
+---
+
+<div class="scroll-progress js-only no-print" aria-hidden="true">
+    <div class="scroll-progress__bar" data-scroll-progress></div>
+</div>
+
+<style>
+    .scroll-progress {
+        position: fixed;
+        inset: 0 0 auto 0;
+        height: 3px;
+        z-index: 1200;
+        pointer-events: none;
+    }
+    .scroll-progress__bar {
+        height: 100%;
+        background: var(--color-primary);
+        transform: scaleX(0);
+        transform-origin: left;
+        will-change: transform;
+    }
+</style>

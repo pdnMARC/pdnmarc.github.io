@@ -1,0 +1,43 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ResearchAreaCard from "../../components/ResearchAreaCard.astro";
+import { getCollection } from "astro:content";
+import { getResearchAreas } from "../../lib/research";
+
+const areas = getResearchAreas();
+const projects = await getCollection("projects");
+const count = (title: string) => projects.filter((p) => p.data.researchArea === title).length;
+---
+
+<BaseLayout
+    title="Research Areas"
+    description="The six technical research areas of the Multidisciplinary AI Research Centre, University of Peradeniya."
+    breadcrumbs={[{ label: "Research Areas" }]}
+    header={{
+        eyebrow: "Research Areas",
+        title: "Exploring Artificial Intelligence Across Disciplines",
+        subtitle: `${areas.length} technical areas where MARC develops AI-powered solutions.`,
+    }}
+>
+    <ul class="grid gap-6 lg:gap-8 md:grid-cols-2 nav:grid-cols-3">
+        {
+            areas.map((a, i) => {
+                const n = count(a.title);
+                return (
+                    <li class="reveal" style={`--reveal-delay:${(i % 3) * 80}ms`}>
+                        <ResearchAreaCard
+                            title={a.title}
+                            href={a.url}
+                            image={a.cover}
+                            summary={a.short}
+                            icon={a.icon}
+                            accent={a.accent}
+                            meta={n > 0 ? `${n} ${n === 1 ? "project" : "projects"}` : undefined}
+                            headingLevel="h2"
+                        />
+                    </li>
+                );
+            })
+        }
+    </ul>
+</BaseLayout>

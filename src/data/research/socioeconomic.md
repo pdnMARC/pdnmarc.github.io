@@ -1,5 +1,4 @@
 ---
-layout: ../../layouts/ResearchArea.astro
 title: Socioeconomic
 coverImage: socioeconomic.png
 short: >

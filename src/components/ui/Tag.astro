@@ -1,0 +1,17 @@
+---
+// Material 3 style chip (non-interactive label).
+import Icon from "./Icon.astro";
+
+interface Props {
+    variant?: "default" | "red" | "ink" | "award" | "live" | "warn" | "outline";
+    icon?: string;
+    class?: string;
+}
+const { variant = "default", icon, class: className } = Astro.props;
+const iconName = icon ?? (variant === "award" ? "material-symbols:trophy-outline" : undefined);
+---
+
+<span class:list={["ui-tag", variant !== "default" && `ui-tag--${variant}`, className]}>
+    {iconName && <Icon name={iconName} />}
+    <slot />
+</span>

@@ -1,0 +1,185 @@
+---
+// Contact (spec §7.8). Phase 1 ships the static content; the validated form with a
+// configurable endpoint (decision D6) replaces the "Write to us" card in Phase 3.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/ui/Icon.astro";
+import Button from "../components/ui/Button.astro";
+import CollaborateBand from "../components/CollaborateBand.astro";
+import { site, socials } from "../data/site";
+
+const mailto = (subject: string) => `mailto:${site.email}?subject=${encodeURIComponent(subject)}`;
+const enquiries = [
+    { label: "General enquiry", icon: "material-symbols:mail-outline" },
+    { label: "Collaboration", icon: "material-symbols:handshake-outline" },
+    { label: "Student opportunity", icon: "material-symbols:school-outline" },
+    { label: "Industry", icon: "material-symbols:apartment" },
+    { label: "Media", icon: "material-symbols:newspaper" },
+];
+---
+
+<BaseLayout
+    title="Contact"
+    description="Get in touch with the Multidisciplinary AI Research Centre at the Faculty of Engineering, University of Peradeniya."
+    width="full"
+    breadcrumbs={[{ label: "Contact" }]}
+    header={{
+        eyebrow: "Contact us",
+        title: "Get in touch",
+        subtitle:
+            "Get in touch with the Multidisciplinary AI Research Centre at the Faculty of Engineering, University of Peradeniya.",
+    }}
+>
+    <section class="container-marc section-y">
+        <div class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
+            <div class="card-surface p-2">
+                <h2 class="px-4 pb-1 pt-4 text-h4">Contact details</h2>
+                <ul>
+                    <li class="row">
+                        <span class="row__icon"><Icon name="material-symbols:location-on-outline" /></span>
+                        <div>
+                            <h3 class="row__title">Office</h3>
+                            <p>{site.address}</p>
+                            <a href={site.mapsUrl} target="_blank" rel="noopener" class="link-arrow mt-1 text-sm">
+                                Open in Google Maps <Icon name="material-symbols:arrow-outward" />
+                                <span class="sr-only"> (opens in a new tab)</span>
+                            </a>
+                        </div>
+                    </li>
+                    <li class="row">
+                        <span class="row__icon"><Icon name="material-symbols:mail-outline" /></span>
+                        <div>
+                            <h3 class="row__title">Email</h3>
+                            <a href={`mailto:${site.email}`} class="text-primary hover:underline">{site.email}</a>
+                        </div>
+                    </li>
+                    <li class="row">
+                        <span class="row__icon"><Icon name="material-symbols:account-balance-outline" /></span>
+                        <div>
+                            <h3 class="row__title">University</h3>
+                            <a href={site.universityUrl} target="_blank" rel="noopener" class="text-primary hover:underline">
+                                {site.university}<span class="sr-only"> (opens in a new tab)</span>
+                            </a>
+                        </div>
+                    </li>
+                    <li class="row">
+                        <span class="row__icon"><Icon name="material-symbols:call-outline" /></span>
+                        <div>
+                            <h3 class="row__title">Telephone</h3>
+                            {
+                                site.telephone ? (
+                                    <a href={`tel:${site.telephone.replace(/\s+/g, "")}`}>{site.telephone}</a>
+                                ) : (
+                                    <p class="text-muted">Not published — please email the Centre.</p>
+                                )
+                            }
+                        </div>
+                    </li>
+                </ul>
+                <div class="flex items-center justify-between gap-4 border-t border-line-soft px-4 py-3">
+                    <span class="text-sm text-muted">Follow MARC</span>
+                    <ul class="flex">
+                        {
+                            socials.map((s) => (
+                                <li>
+                                    <a href={s.href} target="_blank" rel="noopener" class="icon-btn" aria-label={`${s.label} (opens in a new tab)`}>
+                                        <Icon name={s.icon} />
+                                    </a>
+                                </li>
+                            ))
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <div id="message" class="write surface-tonal">
+                <h2 class="text-h3">Write to us</h2>
+                <p class="mt-2">
+                    Email is the reliable route to the Centre. Choose a topic and your mail app opens with the subject
+                    filled in.
+                </p>
+                <ul class="mt-6 flex flex-wrap gap-2">
+                    {
+                        enquiries.map((e) => (
+                            <li>
+                                <a href={mailto(`${e.label} — MARC website`)} class="suggest">
+                                    <Icon name={e.icon} />
+                                    {e.label}
+                                </a>
+                            </li>
+                        ))
+                    }
+                </ul>
+                <div class="mt-8">
+                    <Button href={mailto("Enquiry — MARC website")} iconLeading="material-symbols:send-outline">Email MARC</Button>
+                </div>
+                <p class="mt-4 text-sm text-muted">
+                    These links open your email app. If you don't use one, write to
+                    <a href={`mailto:${site.email}`} class="text-primary underline">{site.email}</a>.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <CollaborateBand primaryHref={mailto("Collaboration — MARC website")} />
+</BaseLayout>
+
+<style>
+    .row {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+        padding: 1rem;
+        border-radius: 16px;
+    }
+    .row__icon {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--tint);
+        color: var(--tint-content);
+    }
+    .row__icon :global(svg) {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+    .row__title {
+        font-size: 0.9375rem;
+        margin-bottom: 0.125rem;
+    }
+    .write {
+        scroll-margin-top: calc(var(--header-h) + 24px);
+        padding: clamp(1.5rem, 4vw, 2.5rem);
+    }
+    .suggest {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-height: 36px;
+        padding: 0 1rem 0 0.75rem;
+        border-radius: 8px;
+        border: 1px solid var(--color-line);
+        background: var(--color-base-100);
+        color: var(--color-body);
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition:
+            background-color var(--t-fast),
+            border-color var(--t-fast);
+    }
+    :global([data-theme="marc-dark"]) .suggest {
+        background: transparent;
+    }
+    .suggest:hover {
+        background: var(--tint);
+        border-color: transparent;
+        color: var(--tint-content);
+    }
+    .suggest :global(svg) {
+        width: 1.125rem;
+        height: 1.125rem;
+        color: var(--color-primary);
+    }
+</style>

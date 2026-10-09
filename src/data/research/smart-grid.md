@@ -1,5 +1,4 @@
 ---
-layout: ../../layouts/ResearchArea.astro
 title: Smart Grid
 coverImage: Smart_Grid_Cover.png
 short: >

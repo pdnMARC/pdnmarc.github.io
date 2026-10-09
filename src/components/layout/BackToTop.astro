@@ -1,0 +1,50 @@
+---
+// Back-to-top button (spec §6.9), Material small-FAB style. Shown after 620px by chrome.ts.
+import Icon from "../ui/Icon.astro";
+---
+
+<a href="#main" class="back-to-top js-only no-print" data-back-to-top aria-label="Back to top">
+    <Icon name="material-symbols:arrow-upward" />
+</a>
+
+<style>
+    .back-to-top {
+        position: fixed;
+        right: 24px;
+        /* Phase 4: move up once the Ask MARC launcher sits below it. */
+        bottom: 24px;
+        z-index: 900;
+        display: grid;
+        place-items: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        background: var(--tint);
+        color: var(--tint-content);
+        box-shadow: var(--shadow-md);
+        opacity: 0;
+        visibility: hidden;
+        transition:
+            opacity var(--t) var(--ease-brand),
+            visibility 0s linear var(--t),
+            box-shadow var(--t-fast);
+    }
+    .back-to-top.is-visible {
+        opacity: 1;
+        visibility: visible;
+        transition-delay: 0s;
+    }
+    .back-to-top:hover {
+        box-shadow: var(--shadow-lg);
+    }
+    .back-to-top :global(svg) {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    @media (max-width: 768px) {
+        .back-to-top {
+            right: 16px;
+            bottom: 16px;
+        }
+    }
+</style>

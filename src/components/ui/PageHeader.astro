@@ -1,26 +1,95 @@
 ---
+// Page header for inner pages (spec §6.7): breadcrumb + label + H1 + subtitle.
+// Owns the page's single <h1>. A small static "network" motif sits on the right on wide screens.
+import Breadcrumb, { type Crumb } from "./Breadcrumb.astro";
+
 interface Props {
     eyebrow?: string;
+    eyebrowTone?: "default" | "red";
     title: string;
     subtitle?: string;
     align?: "left" | "center";
+    breadcrumbs?: Crumb[];
 }
-const { eyebrow, title, subtitle, align = "left" } = Astro.props;
-const alignClass = align === "center" ? "text-center mx-auto" : "text-left";
+const { eyebrow, eyebrowTone = "default", title, subtitle, align = "left", breadcrumbs } = Astro.props;
+const center = align === "center";
+
+// Four layers of nodes, joined layer to layer — a nod to neural networks, drawn with solid colours.
+const layers = [
+    [40, 100, 160],
+    [20, 70, 120, 170],
+    [45, 100, 155],
+    [75, 125],
+].map((ys, li) => ys.map((y) => ({ x: 30 + li * 95, y })));
+const edges = layers.slice(0, -1).flatMap((layer, li) => layer.flatMap((a) => layers[li + 1].map((b) => ({ a, b }))));
+const accentNodes = new Set(["1-2", "3-0"]);
 ---
 
-<header class={`max-w-3xl ${alignClass} mb-14 lg:mb-20`}>
-    {eyebrow && <p class="eyebrow mb-4 text-primary">{eyebrow}</p>}
-    <h1
-        class="font-display text-5xl md:text-6xl lg:text-7xl tracking-tight text-base-content"
-    >
-        {title}
-    </h1>
-    {
-        subtitle && (
-            <p class="mt-6 text-lg md:text-xl text-base-content/70 leading-relaxed">
-                {subtitle}
-            </p>
-        )
-    }
+<header class="page-header">
+    <div class="container-marc relative">
+        {
+            !center && (
+                <svg class="page-header__motif" viewBox="0 0 340 200" aria-hidden="true" focusable="false">
+                    <g class="page-header__edges">
+                        {edges.map(({ a, b }) => (
+                            <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} />
+                        ))}
+                    </g>
+                    {layers.map((layer, li) =>
+                        layer.map((n, ni) => (
+                            <circle
+                                cx={n.x}
+                                cy={n.y}
+                                r={li === 1 || li === 2 ? 6 : 5}
+                                class={accentNodes.has(`${li}-${ni}`) ? "page-header__node page-header__node--alt" : "page-header__node"}
+                            />
+                        )),
+                    )}
+                </svg>
+            )
+        }
+        {breadcrumbs && <Breadcrumb items={breadcrumbs} class="mb-8" />}
+        <div class:list={["relative max-w-3xl", center && "mx-auto text-center"]}>
+            {eyebrow && <p class:list={["eyebrow mb-3", eyebrowTone === "red" && "eyebrow--red"]}>{eyebrow}</p>}
+            <h1 class="text-page-title">{title}</h1>
+            {subtitle && <p class:list={["text-lede mt-4 max-w-2xl", center && "mx-auto"]}>{subtitle}</p>}
+            <slot />
+        </div>
+    </div>
 </header>
+
+<style>
+    .page-header {
+        padding-block: clamp(24px, 3vw, 40px) clamp(40px, 5vw, 64px);
+        background: var(--color-surface-tint);
+        border-bottom: 1px solid var(--color-line-soft);
+        overflow: hidden;
+    }
+    .page-header__motif {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 50%;
+        width: 340px;
+        height: 200px;
+        transform: translateY(-38%);
+    }
+    .page-header__edges line {
+        stroke: var(--color-primary);
+        stroke-width: 1.25;
+        opacity: 0.22;
+    }
+    .page-header__node {
+        fill: var(--color-primary);
+        opacity: 0.55;
+    }
+    .page-header__node--alt {
+        fill: var(--color-secondary);
+        opacity: 0.7;
+    }
+    @media (min-width: 1180px) {
+        .page-header__motif {
+            display: block;
+        }
+    }
+</style>
