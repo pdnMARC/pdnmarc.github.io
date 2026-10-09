@@ -21,7 +21,6 @@ const [projects, publications, people] = await Promise.all([
     getAllPublications(),
     getCollection("people"),
 ]);
-const asOf = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 const stats = [
     { value: getResearchAreas().length, label: "Research areas" },
     { value: projects.length, label: "Research projects" },
@@ -108,7 +107,6 @@ const directorProfile = profileFor(director.name);
             <div class="stats-row mt-12">
                 {stats.map((s) => <Stat value={s.value} label={s.label} />)}
             </div>
-            <p class="mt-3 text-[0.8125rem] text-muted">Counts generated from the site's content · As of {asOf}</p>
         </div>
     </section>
 

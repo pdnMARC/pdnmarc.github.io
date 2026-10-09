@@ -1,5 +1,7 @@
 ---
 // Number + label + optional provenance caption (spec §9.7, "as of" pattern).
+// Numeric values count up when they come into view (chrome.ts, spec §8.3). The animated digits
+// are hidden from screen readers, which read the final value from the visually hidden copy.
 interface Props {
     value: number | string;
     label: string;
@@ -7,10 +9,22 @@ interface Props {
     class?: string;
 }
 const { value, label, caption, class: className } = Astro.props;
+const numeric = typeof value === "number";
 ---
 
 <div class:list={["stat", className]}>
-    <p class="stat__value">{value}</p>
+    <p class="stat__value">
+        {
+            numeric ? (
+                <>
+                    <span aria-hidden="true" data-count={value}>{value}</span>
+                    <span class="sr-only">{value}</span>
+                </>
+            ) : (
+                value
+            )
+        }
+    </p>
     <p class="stat__label">{label}</p>
     {caption && <p class="stat__caption">{caption}</p>}
 </div>

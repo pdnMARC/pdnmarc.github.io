@@ -84,6 +84,40 @@ if (reduceMotion || !("IntersectionObserver" in window)) {
     revealItems.forEach((el) => io.observe(el));
 }
 
+/* ── Count-up stats (spec §8.3) ────────────────────────────── */
+// Numbers marked [data-count] count up from 0 over 1.5 s (ease-out cubic) the first time
+// they are at least half visible. Reduced motion or no JS: the final number is shown as is.
+const counters = document.querySelectorAll<HTMLElement>("[data-count]");
+if (counters.length && !reduceMotion && "IntersectionObserver" in window) {
+    const DURATION = 1500;
+    const countUp = (el: HTMLElement) => {
+        const target = Number(el.dataset.count) || 0;
+        const start = performance.now();
+        const step = (now: number) => {
+            const p = Math.min(1, (now - start) / DURATION);
+            const eased = 1 - Math.pow(1 - p, 3);
+            el.textContent = Math.round(target * eased).toLocaleString("en-GB");
+            if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+    };
+    const counterObserver = new IntersectionObserver(
+        (entries) => {
+            for (const entry of entries) {
+                if (entry.isIntersecting) {
+                    counterObserver.unobserve(entry.target);
+                    countUp(entry.target as HTMLElement);
+                }
+            }
+        },
+        { threshold: 0.5 },
+    );
+    counters.forEach((el) => {
+        el.textContent = "0";
+        counterObserver.observe(el);
+    });
+}
+
 /* ── Mobile drawer ─────────────────────────────────────────── */
 const drawer = document.querySelector<HTMLElement>("[data-drawer]");
 const toggle = document.querySelector<HTMLButtonElement>("[data-drawer-toggle]");
