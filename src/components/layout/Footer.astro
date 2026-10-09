@@ -1,0 +1,251 @@
+---
+// Site footer (spec §6.8): MARC + University of Peradeniya logos, link columns, contact,
+// bottom bar with copyright and accessibility link.
+import { Image } from "astro:assets";
+import logo from "../../assets/logo.png";
+import uopLogo from "../../assets/UOP_logo.png";
+import Icon from "../ui/Icon.astro";
+import BackToTop from "./BackToTop.astro";
+import { site, socials, footerColumns } from "../../data/site";
+
+const year = new Date().getFullYear();
+const a11yMail = `mailto:${site.email}?subject=${encodeURIComponent("Accessibility issue on the MARC website")}`;
+---
+
+<footer class="site-footer no-print">
+    <div class="container-marc">
+        <div class="site-footer__top">
+            <div class="site-footer__logos">
+                <a href="/" class="site-footer__logo-link" aria-label="MARC home">
+                    <Image src={logo} alt="" width={112} height={112} class="site-footer__logo" />
+                </a>
+                <span class="site-footer__divider" aria-hidden="true"></span>
+                <a href={site.universityUrl} target="_blank" rel="noopener" class="site-footer__logo-link">
+                    <Image src={uopLogo} alt="University of Peradeniya" width={190} class="site-footer__logo site-footer__logo--uop" />
+                    <span class="sr-only"> (opens in a new tab)</span>
+                </a>
+                <div class="site-footer__names">
+                    <p class="site-footer__name">{site.name}</p>
+                    <p class="site-footer__uni">{site.university}</p>
+                </div>
+            </div>
+            <ul class="site-footer__social" aria-label="MARC on social media">
+                {
+                    socials.map((s) => (
+                        <li>
+                            <a href={s.href} target="_blank" rel="noopener" class="icon-btn" aria-label={`${s.label} (opens in a new tab)`}>
+                                <Icon name={s.icon} />
+                            </a>
+                        </li>
+                    ))
+                }
+            </ul>
+        </div>
+
+        <div class="site-footer__cols">
+            <div>
+                <h2 class="site-footer__heading">About MARC</h2>
+                <p class="site-footer__blurb">{site.footerBlurb}</p>
+            </div>
+            <nav aria-labelledby="footer-quick">
+                <h2 id="footer-quick" class="site-footer__heading">Quick links</h2>
+                <ul class="site-footer__list">
+                    {footerColumns.quick.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+                </ul>
+            </nav>
+            <nav aria-labelledby="footer-research">
+                <h2 id="footer-research" class="site-footer__heading">Research</h2>
+                <ul class="site-footer__list">
+                    {
+                        footerColumns.research.map((l) => (
+                            <li>
+                                <a href={l.href} target={l.external ? "_blank" : undefined} rel={l.external ? "noopener" : undefined}>
+                                    {l.label}
+                                    {l.external && <Icon name="material-symbols:arrow-outward" class="site-footer__ext" />}
+                                    {l.external && <span class="sr-only"> (opens in a new tab)</span>}
+                                </a>
+                            </li>
+                        ))
+                    }
+                </ul>
+            </nav>
+            <div>
+                <h2 class="site-footer__heading">Contact</h2>
+                <ul class="site-footer__contact">
+                    <li>
+                        <Icon name="material-symbols:location-on-outline" />
+                        <span>{site.address}</span>
+                    </li>
+                    <li>
+                        <Icon name="material-symbols:mail-outline" />
+                        <a href={`mailto:${site.email}`}>{site.email}</a>
+                    </li>
+                    <li>
+                        <Icon name="material-symbols:account-balance-outline" />
+                        <a href={site.universityUrl} target="_blank" rel="noopener">
+                            {site.university}<span class="sr-only"> (opens in a new tab)</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="site-footer__bottom">
+        <div class="container-marc site-footer__bottom-inner">
+            <p>© {year} {site.name}, {site.university}. All rights reserved.</p>
+            <ul class="site-footer__mini" aria-label="Footer">
+                <li><a href="/about/">About</a></li>
+                <li><a href="/contact/">Contact</a></li>
+                <li><a href={a11yMail}>Report an accessibility issue</a></li>
+            </ul>
+        </div>
+    </div>
+    <BackToTop />
+</footer>
+
+<style>
+    .site-footer {
+        background: var(--color-soft);
+        border-top: 1px solid var(--color-line-soft);
+        font-size: 0.875rem;
+        color: var(--color-body);
+    }
+    .site-footer__top {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        padding-block: 2.5rem 2rem;
+        border-bottom: 1px solid var(--color-line);
+    }
+    .site-footer__logos {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .site-footer__logo-link {
+        display: inline-flex;
+        border-radius: 50%;
+    }
+    .site-footer :global(.site-footer__logo) {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #fff;
+        box-shadow: 0 0 0 1px var(--color-line);
+    }
+    .site-footer :global(.site-footer__logo--uop) {
+        box-shadow: none;
+        background: transparent;
+    }
+    .site-footer__divider {
+        width: 1px;
+        height: 40px;
+        background: var(--color-line);
+    }
+    .site-footer__names {
+        margin-left: 0.5rem;
+    }
+    .site-footer__name {
+        font-family: var(--font-head);
+        font-weight: 600;
+        font-size: 1rem;
+        color: var(--color-heading);
+    }
+    .site-footer__uni {
+        color: var(--color-muted);
+    }
+    .site-footer__social {
+        display: flex;
+        gap: 0.125rem;
+    }
+    .site-footer__cols {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr 1fr 1.3fr;
+        gap: 2rem;
+        padding-block: 2.5rem 3rem;
+    }
+    .site-footer__heading {
+        margin-bottom: 0.875rem;
+        font-family: var(--font-head);
+        font-weight: 600;
+        font-size: 0.9375rem;
+        color: var(--color-heading);
+    }
+    .site-footer__blurb {
+        max-width: 34ch;
+        line-height: 1.6;
+    }
+    .site-footer__list {
+        display: grid;
+        gap: 0.625rem;
+    }
+    .site-footer__list a,
+    .site-footer__contact a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    .site-footer__list a:hover,
+    .site-footer__contact a:hover,
+    .site-footer__mini a:hover {
+        color: var(--color-primary);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+    .site-footer :global(.site-footer__ext) {
+        width: 1rem;
+        height: 1rem;
+    }
+    .site-footer__contact {
+        display: grid;
+        gap: 0.75rem;
+    }
+    .site-footer__contact li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.625rem;
+        line-height: 1.5;
+    }
+    .site-footer__contact :global(svg) {
+        flex: none;
+        width: 1.25rem;
+        height: 1.25rem;
+        color: var(--color-muted);
+    }
+    .site-footer__bottom {
+        border-top: 1px solid var(--color-line);
+    }
+    .site-footer__bottom-inner {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem 2rem;
+        padding-block: 1.25rem;
+        color: var(--color-muted);
+    }
+    .site-footer__mini {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.5rem;
+    }
+
+    @media (max-width: 1080px) {
+        .site-footer__cols {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    @media (max-width: 600px) {
+        .site-footer__cols {
+            grid-template-columns: 1fr;
+            gap: 1.75rem;
+        }
+        .site-footer__names {
+            display: none;
+        }
+    }
+</style>

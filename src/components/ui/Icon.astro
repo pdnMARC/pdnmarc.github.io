@@ -1,0 +1,21 @@
+---
+// Inline SVG icon (astro-icon + Iconify sets: `lucide:*`, `mdi:*`).
+// Decorative by default; pass `label` when the icon is the only content of a control.
+import { Icon as AstroIcon } from "astro-icon/components";
+
+interface Props {
+    name: string;
+    label?: string;
+    class?: string;
+    size?: number | string;
+}
+const { name, label, class: className, size } = Astro.props;
+---
+
+{
+    label ? (
+        <AstroIcon name={name} title={label} class={className} size={size} role="img" />
+    ) : (
+        <AstroIcon name={name} class={className} size={size} aria-hidden="true" focusable="false" />
+    )
+}

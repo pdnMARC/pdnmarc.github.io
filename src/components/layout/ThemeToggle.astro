@@ -1,0 +1,27 @@
+---
+// Light/dark switch. Icons follow [data-theme] via CSS so there is no flash;
+// chrome.ts keeps the explicit label ("Switch to … theme") in sync. Needs JS, so hidden without it.
+import Icon from "../ui/Icon.astro";
+
+interface Props {
+    class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<button type="button" class:list={["icon-btn theme-toggle js-only", className]} data-theme-toggle aria-label="Switch to dark theme">
+    <Icon name="material-symbols:dark-mode-outline" class="theme-toggle__moon" />
+    <Icon name="material-symbols:light-mode-outline" class="theme-toggle__sun" />
+</button>
+
+<style>
+    .theme-toggle :global(.theme-toggle__sun) {
+        display: none;
+    }
+    :global([data-theme="marc-dark"]) .theme-toggle :global(.theme-toggle__sun) {
+        display: block;
+    }
+    :global([data-theme="marc-dark"]) .theme-toggle :global(.theme-toggle__moon) {
+        display: none;
+    }
+</style>

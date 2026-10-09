@@ -2,9 +2,13 @@
 import { getCollection, render } from "astro:content";
 import { Image } from "astro:assets";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import Breadcrumb from "../../components/Breadcrumb.astro";
-import default_avatar from "../../assets/avatar_default.svg";
-import "../../styles/app.css";
+import Prose from "../../components/ui/Prose.astro";
+import Tag from "../../components/ui/Tag.astro";
+import Icon from "../../components/ui/Icon.astro";
+import PublicationItem from "../../components/PublicationItem.astro";
+import defaultAvatar from "../../assets/avatar_default.svg";
+import { publicationsForProject, projectLinkMap, groupByYear, normKey } from "../../lib/publications";
+import { getResearchAreas } from "../../lib/research";
 
 export async function getStaticPaths() {
     const projects = await getCollection("projects");
@@ -14,334 +18,207 @@ export async function getStaticPaths() {
     }));
 }
 
-// 1. Setup People Dictionary (Existing)
-const people = await getCollection("people");
-const peopleDict: { [email: string]: (typeof people)[number] } = {};
-people.forEach((person) => {
-    peopleDict[person.data.email] = person;
-});
-
 const { project } = Astro.props;
 const { Content } = await render(project);
 
-// 2. Fetch & Filter Publications (NEW)
-const publications = await getCollection("publications");
-const projectPublications = publications
-    .filter((pub) => pub.data.project === project.data.project) // Match by project name
-    .sort(
-        (a, b) =>
-            new Date(b.data.publication_date).getTime() -
-            new Date(a.data.publication_date).getTime(),
-    );
+// Team entries are matched to profiles by email. Anything that doesn't resolve
+// (e.g. a plain name) renders as text, never as a dead "#" link (fixes B7).
+const people = await getCollection("people");
+const byEmail = new Map(people.map((p) => [p.data.email, p]));
+const resolve = (ref: string) => {
+    const person = byEmail.get(ref);
+    if (!person) console.warn(`[projects/${project.id}] team reference "${ref}" does not match a people profile`);
+    // Never print an unmatched email address (decision D12); plain names are shown as given.
+    return { ref, person, label: person?.data.name ?? (ref.includes("@") ? "Profile not yet published" : ref) };
+};
+const supervisors = project.data.supervisors.map(resolve);
+const members = project.data.projectMembers.map(resolve);
+
+// Papers listed under this project in the publications sheet (see src/lib/publications.ts).
+const projectPublications = await publicationsForProject(project);
+const pubGroups = groupByYear(projectPublications);
+const links = await projectLinkMap();
+const areaPage = getResearchAreas().find((a) => a.title === project.data.researchArea);
 ---
 
-<BaseLayout>
-    <div class="max-w-6xl mx-auto px-4 py-8">
-        <Breadcrumb>
-            <li><a href="/">Home</a></li>
-            <li><a href="/projects">Projects</a></li>
-            <li class="opacity-70 truncate max-w-[200px]">
-                {project.data.project}
-            </li>
-        </Breadcrumb>
-
-        <div class="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-10">
-            {/* --- LEFT COLUMN: Main Content --- */}
-            <main class="lg:col-span-8 space-y-12">
-                {/* Header Info */}
-                <div>
-                    <div class="flex flex-wrap items-center gap-3 mb-4">
-                        <span class="badge badge-primary badge-lg">
-                            {project.data.researchArea}
-                        </span>
-                        {
-                            project.data.researchPillars?.map((pillar) => (
-                                <span class="badge badge-outline">
-                                    {pillar}
-                                </span>
-                            ))
-                        }
-                    </div>
-                    <h1
-                        class="text-4xl md:text-5xl font-extrabold text-base-content leading-tight"
-                    >
-                        {project.data.project}
-                    </h1>
+<BaseLayout
+    title={project.data.project}
+    description={`${project.data.project} — a ${project.data.researchArea} project at the Multidisciplinary AI Research Centre, University of Peradeniya.`}
+    breadcrumbs={[{ label: "Projects", href: "/projects/" }, { label: project.data.project }]}
+>
+    <div class="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-14">
+        <div class="space-y-12 lg:col-span-8">
+            <header>
+                <div class="mb-5 flex flex-wrap items-center gap-2">
+                    <Tag variant="ink">{project.data.researchArea}</Tag>
+                    {project.data.researchPillars.map((pillar) => <Tag variant="outline">{pillar}</Tag>)}
                 </div>
+                <h1 class="text-page-title">{project.data.project}</h1>
+            </header>
 
-                {/* Cover Image */}
+            {
+                project.data.coverImage && (
+                    <div class="overflow-hidden rounded-[var(--radius-panel)] border border-line shadow-md">
+                        <Image
+                            src={project.data.coverImage}
+                            alt=""
+                            widths={[640, 960, 1280]}
+                            sizes="(max-width: 1024px) 100vw, 860px"
+                            class="h-auto w-full object-cover"
+                            loading="eager"
+                            fetchpriority="high"
+                        />
+                    </div>
+                )
+            }
+
+            <Prose>
+                <Content />
+            </Prose>
+
+            {
+                projectPublications.length > 0 && (
+                    <section id="publications" aria-labelledby="publications-title">
+                        <h2 id="publications-title" class="text-h2">
+                            Publications
+                        </h2>
+                        <p class="mt-1 text-muted">
+                            {projectPublications.length} {projectPublications.length === 1 ? "paper" : "papers"} from this project
+                        </p>
+                        {pubGroups.map((g) => (
+                            <div class="mt-8">
+                                <h3 class="border-b border-line pb-2 text-h4">{g.label}</h3>
+                                <ol>
+                                    {g.items.map((pub) => (
+                                        <PublicationItem pub={pub} links={links} headingLevel="h4" hideProject={normKey(project.id)} />
+                                    ))}
+                                </ol>
+                            </div>
+                        ))}
+                        <a href="/publications/" class="link-arrow mt-6">
+                            All publications <Icon name="material-symbols:arrow-forward" />
+                        </a>
+                    </section>
+                )
+            }
+        </div>
+
+        <aside class="lg:col-span-4" aria-label="Project details">
+            <div class="space-y-6 lg:sticky lg:top-24">
+            <div class="card-surface p-6">
+                <h2 class="text-h4">About this project</h2>
+                <dl class="mt-4 grid gap-4 text-[0.9375rem]">
+                    <div>
+                        <dt class="text-sm text-muted">Research area</dt>
+                        <dd class="mt-0.5">
+                            {areaPage ? (
+                                <a href={areaPage.url} class="text-primary hover:underline">{project.data.researchArea}</a>
+                            ) : (
+                                project.data.researchArea
+                            )}
+                        </dd>
+                    </div>
+                    {projectPublications.length > 0 && (
+                        <div>
+                            <dt class="text-sm text-muted">Publications</dt>
+                            <dd class="mt-0.5">
+                                <a href="#publications" class="text-primary hover:underline">
+                                    {projectPublications.length} {projectPublications.length === 1 ? "paper" : "papers"}
+                                </a>
+                            </dd>
+                        </div>
+                    )}
+                </dl>
+            </div>
+            {(supervisors.length > 0 || members.length > 0) && (
+            <div class="card-surface p-6">
+                <h2 class="text-h4 flex items-center gap-2">
+                    <Icon name="material-symbols:group-outline" class="h-5 w-5 text-primary" />
+                    Project team
+                </h2>
+
                 {
-                    project.data.coverImage && (
-                        <div class="rounded-xl overflow-hidden shadow-lg border border-base-200">
-                            <Image
-                                src={project.data.coverImage}
-                                alt={project.data.project}
-                                width={900}
-                                height={500}
-                                class="w-full h-auto object-cover"
-                            />
+                    supervisors.length > 0 && (
+                        <div class="mt-6">
+                            <h3 class="mb-3 text-xs font-bold uppercase tracking-wider text-muted">Supervisors</h3>
+                            <ul class="space-y-1">
+                                {supervisors.map(({ person, label }) => (
+                                    <li>
+                                        {person ? (
+                                            <a href={`/people/${person.id}/`} class="team-row group">
+                                                <Image src={person.data.photo ?? defaultAvatar} alt="" width={80} height={80} class="team-row__avatar h-10 w-10" />
+                                                <span>
+                                                    <span class="block font-semibold text-heading group-hover:text-primary">{label}</span>
+                                                    <span class="block text-xs text-muted">{person.data.post}</span>
+                                                </span>
+                                            </a>
+                                        ) : (
+                                            <span class="team-row">
+                                                <Image src={defaultAvatar} alt="" width={80} height={80} class="team-row__avatar h-10 w-10" />
+                                                <span class="font-semibold text-heading">{label}</span>
+                                            </span>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
                     )
                 }
 
-                {/* Markdown Content */}
-                <article
-                    class="prose prose-lg max-w-none prose-img:rounded-xl prose-headings:text-primary"
-                >
-                    <Content />
-                </article>
-
-                {/* --- RELATED PUBLICATIONS (NEW SECTION) --- */}
                 {
-                    projectPublications.length > 0 && (
-                        <section>
-                            <div class="flex items-center gap-4 mb-6">
-                                <h2 class="text-3xl font-bold text-base-content">
-                                    Related Publications
-                                </h2>
-                                <span class="badge badge-neutral badge-lg">
-                                    {projectPublications.length}
-                                </span>
-                            </div>
-
-                            <div class="space-y-4">
-                                {projectPublications.map((pub) => (
-                                    <div class="card bg-base-100 shadow-sm border border-base-200 hover:border-primary/50 transition-colors">
-                                        <div class="card-body p-5">
-                                            {/* Header: Date & Type */}
-                                            <div class="flex items-center gap-2 mb-2">
-                                                <div
-                                                    class={`badge ${pub.data.type === "Journal" ? "badge-secondary" : "badge-accent"} badge-outline text-xs font-bold uppercase`}
-                                                >
-                                                    {pub.data.type}
-                                                </div>
-                                                <span class="text-xs text-base-content/50 font-mono">
-                                                    {pub.data.publication_date}
-                                                </span>
-                                            </div>
-
-                                            {/* Title */}
-                                            <h3 class="text-lg font-bold leading-snug">
-                                                <a
-                                                    href={pub.data.doi}
-                                                    target="_blank"
-                                                    class="hover:text-primary transition-colors"
-                                                >
-                                                    {pub.data.paper_title}
-                                                </a>
-                                            </h3>
-
-                                            {/* Venue */}
-                                            <p class="text-sm text-base-content/80 italic mt-1">
-                                                {pub.data.venue}
-                                            </p>
-
-                                            {/* Author List (Truncated visually if needed, but keeping simple here) */}
-                                            <p class="text-xs text-base-content/60 mt-2">
-                                                {pub.data.authors.join(", ")}
-                                            </p>
-
-                                            {/* Actions */}
-                                            <div class="card-actions justify-end mt-3">
-                                                <a
-                                                    href={pub.data.doi}
-                                                    target="_blank"
-                                                    class="btn btn-xs btn-outline btn-primary gap-1"
-                                                >
-                                                    Read Paper
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        viewBox="0 0 20 20"
-                                                        fill="currentColor"
-                                                        class="w-3 h-3"
-                                                    >
-                                                        <path
-                                                            fill-rule="evenodd"
-                                                            d="M5 10a.75.75 0 01.75-.75h6.638L10.23 7.29a.75.75 0 111.04-1.08l3.5 3.5a.75.75 0 010 1.08l-3.5 3.5a.75.75 0 11-1.04-1.08l2.158-1.96H5.75A.75.75 0 015 10z"
-                                                            clip-rule="evenodd"
-                                                        />
-                                                    </svg>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
+                    members.length > 0 && (
+                        <div class="mt-6 border-t border-line pt-6">
+                            <h3 class="mb-3 text-xs font-bold uppercase tracking-wider text-muted">Researchers</h3>
+                            <ul class="space-y-1">
+                                {members.map(({ person, label }) => (
+                                    <li>
+                                        {person ? (
+                                            <a href={`/people/${person.id}/`} class="team-row group">
+                                                <Image src={person.data.photo ?? defaultAvatar} alt="" width={64} height={64} class="team-row__avatar h-8 w-8" />
+                                                <span class="truncate font-medium text-heading group-hover:text-primary">{label}</span>
+                                            </a>
+                                        ) : (
+                                            <span class="team-row">
+                                                <Image src={defaultAvatar} alt="" width={64} height={64} class="team-row__avatar h-8 w-8" />
+                                                <span class="truncate font-medium text-heading">{label}</span>
+                                            </span>
+                                        )}
+                                    </li>
                                 ))}
-                            </div>
-                        </section>
+                            </ul>
+                        </div>
                     )
                 }
-            </main>
-
-            {/* --- RIGHT COLUMN: Sidebar (Team & Meta) --- */}
-            <aside class="lg:col-span-4 space-y-8">
-                {/* Team Card */}
-                <div
-                    class="card bg-base-100 shadow-md border border-base-200 sticky top-8"
-                >
-                    <div class="card-body">
-                        <h3
-                            class="card-title text-xl mb-4 flex items-center gap-2"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-5 w-5 text-primary"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                                ></path>
-                            </svg>
-                            Project Team
-                        </h3>
-
-                        {/* Supervisors */}
-                        {
-                            project.data.supervisors &&
-                                project.data.supervisors.length > 0 && (
-                                    <div class="mb-6">
-                                        <h4 class="text-xs font-bold uppercase text-base-content/50 mb-3 tracking-wider">
-                                            Supervisors
-                                        </h4>
-                                        <ul class="space-y-3">
-                                            {project.data.supervisors.map(
-                                                (email) => {
-                                                    const person =
-                                                        peopleDict[email];
-                                                    return (
-                                                        <li>
-                                                            <a
-                                                                href={
-                                                                    person
-                                                                        ? `/people/${person.id}/`
-                                                                        : "#"
-                                                                }
-                                                                class="flex items-center gap-3 group hover:bg-base-200 p-2 rounded-lg transition-colors -mx-2"
-                                                            >
-                                                                <div class="avatar">
-                                                                    <div class="w-10 h-10 rounded-full ring-1 ring-base-300">
-                                                                        <Image
-                                                                            src={
-                                                                                person
-                                                                                    ?.data
-                                                                                    .photo ||
-                                                                                default_avatar
-                                                                            }
-                                                                            alt={
-                                                                                person
-                                                                                    ?.data
-                                                                                    .name ||
-                                                                                email
-                                                                            }
-                                                                            width={
-                                                                                40
-                                                                            }
-                                                                            height={
-                                                                                40
-                                                                            }
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                                <div>
-                                                                    <p class="font-semibold text-sm group-hover:text-primary transition-colors">
-                                                                        {person
-                                                                            ?.data
-                                                                            .name ||
-                                                                            email}
-                                                                    </p>
-                                                                    {person && (
-                                                                        <p class="text-xs text-base-content/60">
-                                                                            {
-                                                                                person
-                                                                                    .data
-                                                                                    .post
-                                                                            }
-                                                                        </p>
-                                                                    )}
-                                                                </div>
-                                                            </a>
-                                                        </li>
-                                                    );
-                                                },
-                                            )}
-                                        </ul>
-                                    </div>
-                                )
-                        }
-
-                        <div class="divider my-0"></div>
-
-                        {/* Members */}
-                        {
-                            project.data.projectMembers &&
-                                project.data.projectMembers.length > 0 && (
-                                    <div class="mt-6">
-                                        <h4 class="text-xs font-bold uppercase text-base-content/50 mb-3 tracking-wider">
-                                            Researchers
-                                        </h4>
-                                        <ul class="space-y-3">
-                                            {project.data.projectMembers.map(
-                                                (email) => {
-                                                    const person =
-                                                        peopleDict[email];
-                                                    return (
-                                                        <li>
-                                                            <a
-                                                                href={
-                                                                    person
-                                                                        ? `/people/${person.id}/`
-                                                                        : "#"
-                                                                }
-                                                                class="flex items-center gap-3 group hover:bg-base-200 p-2 rounded-lg transition-colors -mx-2"
-                                                            >
-                                                                <div class="avatar">
-                                                                    <div class="w-8 h-8 rounded-full ring-1 ring-base-300">
-                                                                        <Image
-                                                                            src={
-                                                                                person
-                                                                                    ?.data
-                                                                                    .photo ||
-                                                                                default_avatar
-                                                                            }
-                                                                            alt={
-                                                                                person
-                                                                                    ?.data
-                                                                                    .name ||
-                                                                                email
-                                                                            }
-                                                                            width={
-                                                                                32
-                                                                            }
-                                                                            height={
-                                                                                32
-                                                                            }
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                                <div class="overflow-hidden">
-                                                                    <p class="font-medium text-sm truncate group-hover:text-primary transition-colors">
-                                                                        {person
-                                                                            ?.data
-                                                                            .name ||
-                                                                            email}
-                                                                    </p>
-                                                                </div>
-                                                            </a>
-                                                        </li>
-                                                    );
-                                                },
-                                            )}
-                                        </ul>
-                                    </div>
-                                )
-                        }
-                    </div>
-                </div>
-            </aside>
-        </div>
+            </div>
+            )}
+            </div>
+        </aside>
     </div>
 </BaseLayout>
+
+<style>
+    .team-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-inline: -0.5rem;
+        padding: 0.5rem;
+        border-radius: 12px;
+        font-size: 0.92rem;
+        line-height: 1.35;
+        min-width: 0;
+    }
+    a.team-row {
+        transition: background-color var(--t-fast);
+    }
+    a.team-row:hover {
+        background: var(--color-soft);
+    }
+    .team-row :global(.team-row__avatar) {
+        flex: none;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 0 0 1px var(--color-line);
+        background: var(--color-soft-2);
+    }
+</style>

@@ -1,29 +1,296 @@
 ---
+// Publications (spec §7.5): every paper, grouped by year. All rows are rendered at build
+// time; the small script below only filters them (works without JS: everything is shown).
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import Breadcrumb from "../../components/Breadcrumb.astro";
-import PublicationsList from "../../components/react/PublicationList";
-import { getCollection } from "astro:content";
+import PublicationItem from "../../components/PublicationItem.astro";
+import Icon from "../../components/ui/Icon.astro";
+import SourceNote from "../../components/ui/SourceNote.astro";
+import { getAllPublications, groupByYear, projectLinkMap, projectChips } from "../../lib/publications";
 
-const publications = await getCollection("publications");
+const pubs = await getAllPublications();
+const links = await projectLinkMap();
+const groups = groupByYear(pubs);
+
+const types = [...new Set(pubs.map((p) => p.type).filter(Boolean))].sort();
+const statuses = ["Published", "Accepted", "Under review"].filter((s) => pubs.some((p) => p.status === s));
+const projectOptions = [...new Map(pubs.flatMap((p) => projectChips(p, links)).map((c) => [c.key, c.label] as const))].sort(
+    (a, b) => a[1].localeCompare(b[1]),
+);
+const anchor = (label: string) => `y-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 ---
 
-<BaseLayout title="Publications">
-    <div class="max-w-5xl mx-auto px-4 py-8">
-        <Breadcrumb>
-            <li><a href="/">Home</a></li>
-            <li>Publications</li>
-        </Breadcrumb>
+<BaseLayout
+    title="Publications"
+    description="Journal articles, conference papers and datasets by MARC researchers, grouped by year."
+    breadcrumbs={[{ label: "Publications" }]}
+    header={{
+        eyebrow: "Publications",
+        title: "Read the latest research from MARC",
+        subtitle: `${pubs.length} journal articles, conference papers and datasets by MARC researchers, grouped by year.`,
+    }}
+>
+    <nav aria-label="Jump to year" class="mb-8">
+        <ul class="flex flex-wrap gap-2">
+            {
+                groups.map((g) => (
+                    <li>
+                        <a href={`#${anchor(g.label)}`} class="year-chip">
+                            {g.label} <span class="year-chip__count">{g.items.length}</span>
+                        </a>
+                    </li>
+                ))
+            }
+        </ul>
+    </nav>
 
-        <div class="mb-8 text-center">
-            <h1 class="text-5xl font-bold mb-4 text-primary">Publications</h1>
-            <p class="text-lg text-base-content/70">
-                Our latest contributions to Journals and Conferences.
-            </p>
+    <form id="pub-filters" class="filters js-only" role="search" aria-label="Filter publications">
+        <label class="filters__search">
+            <span class="sr-only">Search publications</span>
+            <Icon name="material-symbols:search" />
+            <input type="search" name="q" placeholder="Search title, authors or venue" autocomplete="off" />
+        </label>
+        <label class="filters__field">
+            <span class="sr-only">Year</span>
+            <select name="year">
+                <option value="">All years</option>
+                {groups.map((g) => <option value={g.label}>{g.label}</option>)}
+            </select>
+        </label>
+        <label class="filters__field">
+            <span class="sr-only">Type</span>
+            <select name="type">
+                <option value="">All types</option>
+                {types.map((t) => <option value={t.toLowerCase()}>{t}</option>)}
+            </select>
+        </label>
+        <label class="filters__field">
+            <span class="sr-only">Project</span>
+            <select name="project">
+                <option value="">All projects</option>
+                {projectOptions.map(([key, label]) => <option value={key}>{label}</option>)}
+            </select>
+        </label>
+        <label class="filters__field">
+            <span class="sr-only">Status</span>
+            <select name="status">
+                <option value="">Any status</option>
+                {statuses.map((s) => <option value={s.toLowerCase()}>{s}</option>)}
+            </select>
+        </label>
+        <div class="filters__meta">
+            <p aria-live="polite"><strong data-count>{pubs.length}</strong> of {pubs.length} publications</p>
+            <button type="reset" class="ui-btn ui-btn--text ui-btn--sm" data-clear hidden>Clear filters</button>
         </div>
+    </form>
 
+    <p class="empty" data-empty hidden>No publications match these filters.</p>
+
+    <div class="space-y-12">
         {
-            /* Hydrate the component with client:load so it's interactive immediately */
+            groups.map((g) => (
+                <section id={anchor(g.label)} class="year-group" data-group-section={g.label} aria-labelledby={`${anchor(g.label)}-h`}>
+                    <h2 id={`${anchor(g.label)}-h`} class="year-group__head">
+                        <span class="text-h2 year-group__year">{g.label}</span>
+                        <span class="year-group__count" data-group-count>
+                            {g.items.length} {g.items.length === 1 ? "paper" : "papers"}
+                        </span>
+                    </h2>
+                    <ol>
+                        {g.items.map((p) => (
+                            <PublicationItem pub={p} links={links} />
+                        ))}
+                    </ol>
+                </section>
+            ))
         }
-        <PublicationsList publications={publications} client:load />
     </div>
+
+    <SourceNote class="mt-14">
+        Publications are listed from MARC's publications sheet, one tab per project. Years come from the venue name or
+        the DOI record; papers still under review are listed separately.
+    </SourceNote>
 </BaseLayout>
+
+<script>
+    const form = document.getElementById("pub-filters") as HTMLFormElement | null;
+    if (form) {
+        const items = Array.from(document.querySelectorAll<HTMLElement>("[data-pub]"));
+        const sections = Array.from(document.querySelectorAll<HTMLElement>("[data-group-section]"));
+        const countEl = form.querySelector<HTMLElement>("[data-count]");
+        const clearBtn = form.querySelector<HTMLButtonElement>("[data-clear]");
+        const empty = document.querySelector<HTMLElement>("[data-empty]");
+        const fields = ["q", "year", "type", "project", "status"] as const;
+        const control = (name: string) => form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement;
+
+        // Restore filters from the URL (?q=&year=&type=&project=&status=)
+        const params = new URLSearchParams(location.search);
+        for (const f of fields) {
+            const v = params.get(f);
+            if (v) control(f).value = v;
+        }
+
+        const apply = () => {
+            const q = control("q").value.trim().toLowerCase();
+            const year = control("year").value;
+            const type = control("type").value;
+            const project = control("project").value;
+            const status = control("status").value;
+            let shown = 0;
+            for (const el of items) {
+                const ok =
+                    (!q || (el.dataset.q ?? "").includes(q)) &&
+                    (!year || el.dataset.group === year) &&
+                    (!type || el.dataset.type === type) &&
+                    (!project || (el.dataset.projects ?? "").split(" ").includes(project)) &&
+                    (!status || el.dataset.status === status);
+                el.hidden = !ok;
+                if (ok) shown++;
+            }
+            for (const section of sections) {
+                const visible = section.querySelectorAll("[data-pub]:not([hidden])").length;
+                section.hidden = visible === 0;
+                const c = section.querySelector<HTMLElement>("[data-group-count]");
+                if (c) c.textContent = `${visible} ${visible === 1 ? "paper" : "papers"}`;
+            }
+            if (countEl) countEl.textContent = String(shown);
+            if (empty) empty.hidden = shown !== 0;
+            const active = fields.some((f) => control(f).value);
+            if (clearBtn) clearBtn.hidden = !active;
+
+            const next = new URLSearchParams();
+            for (const f of fields) if (control(f).value) next.set(f, control(f).value.trim());
+            const qs = next.toString();
+            history.replaceState(null, "", qs ? `?${qs}` : location.pathname);
+        };
+
+        let timer: number | undefined;
+        form.addEventListener("input", (e) => {
+            if ((e.target as HTMLElement).getAttribute("name") === "q") {
+                window.clearTimeout(timer);
+                timer = window.setTimeout(apply, 150);
+            } else apply();
+        });
+        form.addEventListener("submit", (e) => e.preventDefault());
+        form.addEventListener("reset", () => setTimeout(apply, 0));
+        apply();
+    }
+</script>
+
+<style>
+    .year-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        min-height: 36px;
+        padding: 0 0.875rem;
+        border-radius: 8px;
+        border: 1px solid var(--color-line);
+        color: var(--color-body);
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: background-color var(--t-fast);
+    }
+    .year-chip:hover {
+        background: var(--state);
+    }
+    .year-chip__count {
+        color: var(--color-muted);
+        font-size: 0.8125rem;
+    }
+    .filters {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) repeat(4, minmax(0, 1fr));
+        gap: 0.75rem;
+        padding: 1rem;
+        margin-bottom: 2.5rem;
+        border-radius: var(--radius-card);
+        background: var(--color-soft);
+    }
+    .filters__search {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-height: 44px;
+        padding: 0 1rem;
+        border-radius: 999px;
+        border: 1px solid var(--color-line);
+        background: var(--color-base-100);
+        color: var(--color-muted);
+    }
+    .filters__search :global(svg) {
+        width: 1.25rem;
+        height: 1.25rem;
+        flex: none;
+    }
+    .filters__search input {
+        width: 100%;
+        min-width: 0;
+        border: 0;
+        background: transparent;
+        color: var(--color-heading);
+        font-size: 0.9375rem;
+        outline: none;
+    }
+    .filters__search:focus-within {
+        outline: 2px solid var(--focus);
+        outline-offset: 2px;
+    }
+    .filters__field select {
+        width: 100%;
+        min-height: 44px;
+        padding: 0 2rem 0 1rem;
+        border-radius: 999px;
+        border: 1px solid var(--color-line);
+        background-color: var(--color-base-100);
+        color: var(--color-heading);
+        font-size: 0.9375rem;
+    }
+    .filters__meta {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        font-size: 0.875rem;
+        color: var(--color-muted);
+    }
+    .filters__meta strong {
+        color: var(--color-heading);
+    }
+    @media (max-width: 1080px) {
+        .filters {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .filters__search {
+            grid-column: 1 / -1;
+        }
+    }
+    @media (max-width: 480px) {
+        .filters {
+            grid-template-columns: 1fr;
+        }
+    }
+    .year-group {
+        scroll-margin-top: calc(var(--header-h) + 24px);
+    }
+    .year-group__head {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--color-heading);
+    }
+    .year-group__year {
+        color: var(--color-primary);
+    }
+    .year-group__count {
+        font-size: 0.9375rem;
+        font-weight: 400;
+        color: var(--color-muted);
+    }
+    .empty {
+        padding: 3rem 0;
+        text-align: center;
+        color: var(--color-muted);
+    }
+</style>

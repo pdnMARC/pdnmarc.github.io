@@ -1,5 +1,4 @@
 ---
-layout: ../../layouts/ResearchArea.astro
 title: Computer Vision
 coverImage: Computer_Vision_Cover.jpg
 short: >

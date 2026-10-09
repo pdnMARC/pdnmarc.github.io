@@ -1,0 +1,38 @@
+---
+// Number + label + optional provenance caption (spec §9.7, "as of" pattern).
+interface Props {
+    value: number | string;
+    label: string;
+    caption?: string;
+    class?: string;
+}
+const { value, label, caption, class: className } = Astro.props;
+---
+
+<div class:list={["stat", className]}>
+    <p class="stat__value">{value}</p>
+    <p class="stat__label">{label}</p>
+    {caption && <p class="stat__caption">{caption}</p>}
+</div>
+
+<style>
+    .stat__value {
+        font-family: var(--font-head);
+        font-weight: 600;
+        font-size: clamp(2rem, 1.6vw + 1.4rem, 2.75rem);
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        color: var(--color-heading);
+        font-variant-numeric: tabular-nums;
+    }
+    .stat__label {
+        margin-top: 0.25rem;
+        font-size: 0.9375rem;
+        color: var(--color-body);
+    }
+    .stat__caption {
+        margin-top: 0.125rem;
+        font-size: 0.8125rem;
+        color: var(--color-muted);
+    }
+</style>

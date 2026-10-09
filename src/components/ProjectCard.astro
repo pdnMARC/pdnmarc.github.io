@@ -1,0 +1,118 @@
+---
+// Project card (spec §9.5): cover, research area (icon + accent colour), title, pillars, footer.
+// The whole card is one link.
+import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
+import Icon from "./ui/Icon.astro";
+import Tag from "./ui/Tag.astro";
+import { areaMeta } from "../lib/research";
+
+interface Props {
+    project: CollectionEntry<"projects">;
+    /** Number of publications listed for the project (optional footer note). */
+    papers?: number;
+    headingLevel?: "h2" | "h3";
+}
+const { project, papers = 0, headingLevel: H = "h3" } = Astro.props;
+const area = areaMeta(project.data.researchArea);
+const team = project.data.projectMembers.length + project.data.supervisors.length;
+---
+
+<a href={`/projects/${project.id}/`} class:list={["project-card group card-surface surface-hover", `acc-${area.accent}`]}>
+    <div class="project-card__media">
+        {
+            project.data.coverImage ? (
+                <Image
+                    src={project.data.coverImage}
+                    alt=""
+                    widths={[400, 640, 800]}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1080px) 50vw, 420px"
+                    class="project-card__img"
+                />
+            ) : (
+                <div class="grid h-full place-items-center text-muted">
+                    <Icon name="material-symbols:description-outline" class="h-12 w-12 opacity-40" />
+                </div>
+            )
+        }
+    </div>
+    <div class="project-card__body">
+        <p class="acc-label">
+            <Icon name={area.icon} />
+            {project.data.researchArea}
+        </p>
+        <H class="text-h4 mt-2 line-clamp-3 transition-colors group-hover:text-primary">{project.data.project}</H>
+        {
+            project.data.researchPillars.length > 0 && (
+                <div class="mt-4 flex flex-wrap gap-2">
+                    {project.data.researchPillars.map((pillar) => (
+                        <Tag variant="outline">{pillar}</Tag>
+                    ))}
+                </div>
+            )
+        }
+        <div class="project-card__foot">
+            <span class="inline-flex items-center gap-3">
+                {
+                    papers > 0 && (
+                        <span class="inline-flex items-center gap-1">
+                            <Icon name="material-symbols:article-outline" class="h-4 w-4" />
+                            {papers} {papers === 1 ? "paper" : "papers"}
+                        </span>
+                    )
+                }
+                {
+                    team > 0 && (
+                        <span class="inline-flex items-center gap-1">
+                            <Icon name="material-symbols:group-outline" class="h-4 w-4" />
+                            {team}
+                        </span>
+                    )
+                }
+            </span>
+            <span class="link-arrow">
+                View project <Icon name="material-symbols:arrow-forward" />
+            </span>
+        </div>
+    </div>
+</a>
+
+<style>
+    .project-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+        border-top: 3px solid var(--acc);
+    }
+    .project-card__media {
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        background: var(--color-soft-2);
+    }
+    .project-card :global(.project-card__img) {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform var(--t-slow) var(--ease-brand);
+    }
+    .project-card:hover :global(.project-card__img) {
+        transform: scale(1.04);
+    }
+    .project-card__body {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        padding: 1.25rem 1.5rem 1.5rem;
+    }
+    .project-card__foot {
+        margin-top: auto;
+        padding-top: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        font-size: 0.875rem;
+        color: var(--color-muted);
+    }
+</style>

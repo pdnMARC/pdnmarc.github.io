@@ -1,0 +1,86 @@
+---
+// Breadcrumb trail with aria-current on the last item and BreadcrumbList JSON-LD (spec §6.6).
+// "Home" is prepended automatically.
+import Icon from "./Icon.astro";
+
+export interface Crumb {
+    label: string;
+    href?: string;
+}
+interface Props {
+    items: Crumb[];
+    class?: string;
+}
+const { items, class: className } = Astro.props;
+const trail: Crumb[] = [{ label: "Home", href: "/" }, ...items];
+const site = Astro.site ?? new URL(Astro.url.origin);
+const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: trail.map((c, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: c.label,
+        item: new URL(c.href ?? Astro.url.pathname, site).href,
+    })),
+};
+---
+
+<nav aria-label="Breadcrumb" class:list={["crumbs", className]}>
+    <ol>
+        {
+            trail.map((c, i) => {
+                const last = i === trail.length - 1;
+                return (
+                    <li>
+                        {i > 0 && <Icon name="material-symbols:chevron-right" class="crumbs__sep" />}
+                        {last || !c.href ? (
+                            <span aria-current={last ? "page" : undefined} class="crumbs__current">
+                                {c.label}
+                            </span>
+                        ) : (
+                            <a href={c.href}>{c.label}</a>
+                        )}
+                    </li>
+                );
+            })
+        }
+    </ol>
+</nav>
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+<style>
+    .crumbs ol {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.875rem;
+        color: var(--color-muted);
+    }
+    .crumbs li {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        min-width: 0;
+    }
+    .crumbs :global(.crumbs__sep) {
+        width: 1.125rem;
+        height: 1.125rem;
+        flex: none;
+    }
+    .crumbs a {
+        color: var(--color-primary);
+    }
+    .crumbs a:hover {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+    .crumbs__current {
+        color: var(--color-body);
+        max-width: min(48ch, 62vw);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>

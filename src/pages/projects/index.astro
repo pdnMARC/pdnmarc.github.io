@@ -1,124 +1,134 @@
 ---
+// Projects (spec §7.4): every project is rendered at build time; the area chips only filter
+// them (without JS all projects are shown and the chips are hidden).
 import { getCollection } from "astro:content";
-import { Image } from "astro:assets";
-import Breadcrumb from "../../components/Breadcrumb.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import "../../styles/app.css";
+import ProjectCard from "../../components/ProjectCard.astro";
+import Icon from "../../components/ui/Icon.astro";
+import { getResearchAreas, areaMeta } from "../../lib/research";
+import { publicationsForProject } from "../../lib/publications";
 
-const projects = await getCollection("projects");
+const areas = getResearchAreas();
+const order = (title: string) => {
+    const i = areas.findIndex((a) => a.title === title);
+    return i === -1 ? areas.length : i;
+};
+const projects = (await getCollection("projects")).sort(
+    (a, b) => order(a.data.researchArea) - order(b.data.researchArea) || a.data.project.localeCompare(b.data.project),
+);
+const papers = new Map(
+    await Promise.all(projects.map(async (p) => [p.id, (await publicationsForProject(p)).length] as const)),
+);
+const chips = areas
+    .map((a) => ({ ...a, count: projects.filter((p) => p.data.researchArea === a.title).length }))
+    .filter((a) => a.count > 0);
 ---
 
-<BaseLayout>
-    <div class="max-w-7xl mx-auto px-4 py-8">
-        <Breadcrumb>
-            <li><a href="/">Home</a></li>
-            <li>Projects</li>
-        </Breadcrumb>
-
-        <main class="mt-8">
-            {/* Header Section */}
-            <div class="mb-12 text-center max-w-2xl mx-auto">
-                <h1 class="text-5xl font-bold mb-4 text-primary">
-                    Research Projects
-                </h1>
-                <p class="text-lg text-base-content/70">
-                    Exploring the frontiers of engineering and AI.
-                </p>
-            </div>
-
-            {/* Projects Grid */}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {
-                    projects.map((project) => (
-                        <a
-                            href={`/projects/${project.id}`}
-                            class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-2xl hover:-translate-y-1 hover:border-primary transition-all duration-300 group h-full flex flex-col"
-                        >
-                            {/* Cover Image */}
-                            <figure class="aspect-video overflow-hidden relative bg-base-200">
-                                {project.data.coverImage ? (
-                                    <Image
-                                        src={project.data.coverImage}
-                                        alt={project.data.project}
-                                        width={600}
-                                        height={337}
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                    />
-                                ) : (
-                                    /* Fallback if no image */
-                                    <div class="w-full h-full flex items-center justify-center bg-base-200 text-base-content/20">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="h-16 w-16"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                            />
-                                        </svg>
-                                    </div>
-                                )}
-
-                                {/* Research Area Overlay Badge (Top Right) */}
-                                <div class="absolute top-3 right-3">
-                                    <div class="badge badge-secondary shadow-md font-semibold">
-                                        {project.data.researchArea}
-                                    </div>
-                                </div>
-                            </figure>
-
-                            <div class="card-body p-6 flex flex-col flex-grow">
-                                {/* Title */}
-                                <h2 class="card-title text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                                    {project.data.project}
-                                </h2>
-
-                                {/* Research Pillars (Tags) */}
-                                <div class="flex flex-wrap gap-2 mt-auto pt-4">
-                                    {project.data.researchPillars?.map(
-                                        (pillar) => (
-                                            <span class="badge badge-outline badge-sm text-xs">
-                                                {pillar}
-                                            </span>
-                                        ),
-                                    )}
-                                </div>
-
-                                {/* Bottom Info Row */}
-                                <div class="divider my-2" />
-                                <div class="flex justify-between items-center text-xs text-base-content/60 font-medium">
-                                    <div class="flex items-center gap-1">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            class="w-4 h-4"
-                                        >
-                                            <path d="M7 8a3 3 0 100-6 3 3 0 000 6zM14.5 9a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM1.615 16.428a1.224 1.224 0 01-.569-1.175 6.002 6.002 0 0111.908 0c.058.467-.172.92-.57 1.174A9.953 9.953 0 017 18a9.953 9.953 0 01-5.385-1.572zM14.5 16h-.106c.07-.297.088-.611.048-.933a7.47 7.47 0 00-1.588-3.755 4.502 4.502 0 015.874 2.636.818.818 0 01-.36.98A7.465 7.465 0 0114.5 16z" />
-                                        </svg>
-                                        {/* Calculate total team size */}
-                                        <span>
-                                            {(project.data.projectMembers
-                                                ?.length || 0) +
-                                                (project.data.supervisors
-                                                    ?.length || 0)}{" "}
-                                            Members
-                                        </span>
-                                    </div>
-                                    <span class="group-hover:translate-x-1 transition-transform text-primary font-bold">
-                                        View Project &rarr;
-                                    </span>
-                                </div>
-                            </div>
-                        </a>
-                    ))
-                }
-            </div>
-        </main>
+<BaseLayout
+    title="Research Projects"
+    description="Research projects at the Multidisciplinary AI Research Centre, University of Peradeniya."
+    breadcrumbs={[{ label: "Projects" }]}
+    header={{
+        eyebrow: "Research Projects",
+        eyebrowTone: "red",
+        title: "Transforming Research into Real-World Impact",
+        subtitle: `${projects.length} ${projects.length === 1 ? "project" : "projects"} across MARC's research areas.`,
+    }}
+>
+    <div class="js-only mb-8" data-area-filter>
+        <div role="group" aria-label="Filter projects by research area" class="flex flex-wrap gap-2">
+            <button type="button" class="area-chip" data-area="" aria-pressed="true">
+                All areas <span class="area-chip__count">{projects.length}</span>
+            </button>
+            {
+                chips.map((a) => (
+                    <button type="button" class:list={["area-chip", `acc-${a.accent}`]} data-area={a.slug} aria-pressed="false">
+                        <Icon name={a.icon} />
+                        {a.title}
+                        <span class="area-chip__count">{a.count}</span>
+                    </button>
+                ))
+            }
+        </div>
+        <p class="mt-4 text-sm text-muted" aria-live="polite">
+            Showing <strong class="text-heading" data-shown>{projects.length}</strong> of {projects.length} projects
+        </p>
     </div>
+
+    <ul class="grid grid-cols-1 gap-6 md:grid-cols-2 nav:grid-cols-3 lg:gap-8">
+        {
+            projects.map((project, i) => (
+                <li class="reveal" style={`--reveal-delay:${(i % 3) * 70}ms`} data-area={areaMeta(project.data.researchArea).slug ?? ""}>
+                    <ProjectCard project={project} papers={papers.get(project.id)} headingLevel="h2" />
+                </li>
+            ))
+        }
+    </ul>
 </BaseLayout>
+
+<script>
+    const root = document.querySelector<HTMLElement>("[data-area-filter]");
+    if (root) {
+        const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>("button[data-area]"));
+        const items = Array.from(document.querySelectorAll<HTMLElement>("li[data-area]"));
+        const shown = root.querySelector<HTMLElement>("[data-shown]");
+        const apply = (area: string) => {
+            for (const b of buttons) b.setAttribute("aria-pressed", String(b.dataset.area === area));
+            let n = 0;
+            for (const li of items) {
+                const ok = !area || li.dataset.area === area;
+                li.hidden = !ok;
+                if (ok) {
+                    n++;
+                    li.classList.add("is-in");
+                }
+            }
+            if (shown) shown.textContent = String(n);
+            const url = new URL(location.href);
+            if (area) url.searchParams.set("area", area);
+            else url.searchParams.delete("area");
+            history.replaceState(null, "", url.pathname + url.search);
+        };
+        for (const b of buttons) b.addEventListener("click", () => apply(b.dataset.area ?? ""));
+        const initial = new URLSearchParams(location.search).get("area") ?? "";
+        if (buttons.some((b) => b.dataset.area === initial)) apply(initial);
+    }
+</script>
+
+<style>
+    .area-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        min-height: 40px;
+        padding: 0 0.875rem;
+        border-radius: 999px;
+        border: 1px solid var(--color-line);
+        background: var(--color-base-100);
+        color: var(--color-body);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition:
+            background-color var(--t-fast),
+            border-color var(--t-fast),
+            color var(--t-fast);
+    }
+    .area-chip :global(svg) {
+        width: 1.125rem;
+        height: 1.125rem;
+        color: var(--acc, var(--color-primary));
+    }
+    .area-chip:hover {
+        background: var(--state);
+    }
+    .area-chip[aria-pressed="true"] {
+        background: var(--acc-bg, var(--tint));
+        border-color: transparent;
+        color: var(--acc, var(--tint-content));
+    }
+    .area-chip__count {
+        font-size: 0.8125rem;
+        opacity: 0.8;
+    }
+</style>

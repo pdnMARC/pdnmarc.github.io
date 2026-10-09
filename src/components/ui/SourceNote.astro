@@ -1,0 +1,39 @@
+---
+// Editorial-transparency note: where the content on this page comes from (spec G20).
+import Icon from "./Icon.astro";
+
+interface Props {
+    class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<p class:list={["source-note", className]}>
+    <Icon name="material-symbols:info-outline" class="source-note__icon" />
+    <span><slot /></span>
+</p>
+
+<style>
+    .source-note {
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-start;
+        padding: 0.875rem 1rem;
+        border-radius: 12px;
+        background: var(--color-soft);
+        color: var(--color-muted);
+        font-size: 0.875rem;
+        line-height: 1.55;
+    }
+    .source-note :global(.source-note__icon) {
+        flex: none;
+        width: 1.25rem;
+        height: 1.25rem;
+        color: var(--color-muted);
+    }
+    .source-note :global(a) {
+        color: var(--color-primary);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+</style>

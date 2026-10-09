@@ -1,0 +1,332 @@
+---
+// Sticky header + navigation drawer (spec §6.3). Behaviour lives in src/scripts/chrome.ts.
+// Without JS the menu button is a link to #site-drawer and the drawer opens via :target.
+import { Image } from "astro:assets";
+import logo from "../../assets/logo.png";
+import Icon from "../ui/Icon.astro";
+import Button from "../ui/Button.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+import { nav, socials } from "../../data/site";
+
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const isActive = (href: string) =>
+    href === "/" ? path === "/" : path === href || path.startsWith(href + "/");
+const closeHref = Astro.url.pathname;
+---
+
+<header class="site-header no-print" data-site-header>
+    <div class="container-wide site-header__inner">
+        <button
+            type="button"
+            class="icon-btn nav-toggle js-only"
+            data-drawer-toggle
+            aria-controls="site-drawer"
+            aria-expanded="false"
+            aria-label="Open menu"
+        >
+            <Icon name="material-symbols:menu" />
+        </button>
+        <a href="#site-drawer" class="icon-btn nav-toggle nojs-only" aria-label="Open menu">
+            <Icon name="material-symbols:menu" />
+        </a>
+
+        <a href="/" class="brand">
+            <Image src={logo} alt="" width={80} height={80} class="brand__logo" loading="eager" />
+            <span class="brand__name">MARC</span>
+            <span class="brand__sub">AI Research Centre</span>
+        </a>
+
+        <nav aria-label="Primary" class="nav-desktop">
+            <ul>
+                {
+                    nav.map((l) => (
+                        <li>
+                            <a href={l.href} class="nav-link" aria-current={isActive(l.href) ? "page" : undefined}>
+                                {l.label}
+                            </a>
+                        </li>
+                    ))
+                }
+            </ul>
+        </nav>
+
+        <div class="site-header__actions">
+            <ThemeToggle />
+            <Button href="/contact/" size="sm" class="header-cta">Contact us</Button>
+        </div>
+    </div>
+</header>
+
+<div id="site-drawer" class="drawer no-print" data-drawer>
+    <a href={closeHref} class="drawer__scrim nojs-only" tabindex="-1" aria-hidden="true"></a>
+    <div class="drawer__scrim js-only" data-drawer-close aria-hidden="true"></div>
+    <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="Site menu">
+        <div class="drawer__head">
+            <span class="drawer__title">MARC</span>
+            <button type="button" class="icon-btn js-only" data-drawer-close aria-label="Close menu">
+                <Icon name="material-symbols:close" />
+            </button>
+            <a href={closeHref} class="icon-btn nojs-only" aria-label="Close menu">
+                <Icon name="material-symbols:close" />
+            </a>
+        </div>
+        <nav aria-label="Site">
+            <ul class="drawer__links">
+                {
+                    nav.map((l) => (
+                        <li>
+                            <a href={l.href} class="drawer__link" aria-current={isActive(l.href) ? "page" : undefined}>
+                                {l.label}
+                            </a>
+                        </li>
+                    ))
+                }
+            </ul>
+        </nav>
+        <div class="drawer__foot">
+            <Button href="/contact/" block>Contact us</Button>
+            <ul class="drawer__social" aria-label="MARC on social media">
+                {
+                    socials.map((s) => (
+                        <li>
+                            <a href={s.href} target="_blank" rel="noopener" class="icon-btn" aria-label={`${s.label} (opens in a new tab)`}>
+                                <Icon name={s.icon} />
+                            </a>
+                        </li>
+                    ))
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    import "../../scripts/chrome";
+</script>
+
+<style>
+    .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: var(--color-base-100);
+        border-bottom: 1px solid var(--color-line-soft);
+        transition: box-shadow var(--t) var(--ease-brand);
+    }
+    .site-header.is-stuck {
+        box-shadow: var(--shadow-sm);
+        border-bottom-color: transparent;
+    }
+    .site-header__inner {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        height: var(--header-h);
+    }
+
+    .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.625rem;
+        flex: none;
+        margin-right: auto;
+        padding: 4px 8px 4px 0;
+        border-radius: 999px;
+    }
+    .brand :global(.brand__logo) {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        box-shadow: 0 0 0 1px var(--color-line);
+    }
+    .brand__name {
+        font-family: var(--font-head);
+        font-weight: 700;
+        font-size: 1.25rem;
+        letter-spacing: -0.01em;
+        color: var(--color-heading);
+    }
+    .brand__sub {
+        padding-left: 0.625rem;
+        border-left: 1px solid var(--color-line);
+        font-size: 0.9375rem;
+        color: var(--color-muted);
+        white-space: nowrap;
+    }
+
+    .nav-desktop {
+        display: none;
+        align-self: stretch;
+    }
+    .nav-desktop ul {
+        display: flex;
+        height: 100%;
+    }
+    .nav-link {
+        position: relative;
+        display: flex;
+        align-items: center;
+        height: 100%;
+        padding: 0 0.875rem;
+        font-weight: 500;
+        font-size: 0.9375rem;
+        color: var(--color-body);
+        transition: color var(--t-fast);
+    }
+    .nav-link:hover {
+        color: var(--color-heading);
+    }
+    .nav-link::after {
+        content: "";
+        position: absolute;
+        left: 0.5rem;
+        right: 0.5rem;
+        bottom: -1px;
+        height: 3px;
+        border-radius: 3px 3px 0 0;
+        background: var(--color-primary);
+        opacity: 0;
+    }
+    .nav-link[aria-current="page"] {
+        color: var(--color-primary);
+    }
+    .nav-link[aria-current="page"]::after {
+        opacity: 1;
+    }
+
+    .site-header__actions {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        flex: none;
+    }
+    .site-header__actions :global(.header-cta) {
+        display: none;
+        margin-left: 0.5rem;
+    }
+
+    @media (min-width: 1081px) {
+        .nav-toggle {
+            display: none !important;
+        }
+        .nav-desktop {
+            display: block;
+            margin-inline: auto;
+        }
+        .brand {
+            margin-right: 0;
+        }
+        .site-header__actions :global(.header-cta) {
+            display: inline-flex;
+        }
+    }
+    @media (min-width: 1081px) and (max-width: 1279px) {
+        .brand__sub {
+            display: none;
+        }
+        .nav-link {
+            padding: 0 0.625rem;
+        }
+    }
+    @media (max-width: 560px) {
+        .brand__sub {
+            display: none;
+        }
+    }
+
+    /* Navigation drawer (Material 3 modal drawer) */
+    .drawer {
+        position: fixed;
+        inset: 0;
+        z-index: 1100;
+        visibility: hidden;
+        pointer-events: none;
+        transition: visibility 0s linear var(--t);
+    }
+    .drawer.is-open,
+    .drawer:target {
+        visibility: visible;
+        pointer-events: auto;
+        transition-delay: 0s;
+    }
+    .drawer__scrim {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.32);
+        opacity: 0;
+        transition: opacity var(--t) var(--ease-brand);
+    }
+    .drawer.is-open .drawer__scrim,
+    .drawer:target .drawer__scrim {
+        opacity: 1;
+    }
+    .drawer__panel {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: min(320px, 86vw);
+        display: flex;
+        flex-direction: column;
+        background: var(--color-base-100);
+        border-radius: 0 16px 16px 0;
+        box-shadow: var(--shadow-lg);
+        transform: translateX(-100%);
+        transition: transform var(--t) var(--ease-brand);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+    :global([data-theme="marc-dark"]) .drawer__panel {
+        background: var(--color-soft);
+    }
+    .drawer.is-open .drawer__panel,
+    .drawer:target .drawer__panel {
+        transform: translateX(0);
+    }
+    .drawer__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 0.75rem 0.5rem 1.75rem;
+    }
+    .drawer__title {
+        font-family: var(--font-head);
+        font-weight: 700;
+        font-size: 1.125rem;
+        color: var(--color-heading);
+    }
+    .drawer__links {
+        padding: 0.25rem 0.75rem;
+    }
+    .drawer__link {
+        display: flex;
+        align-items: center;
+        min-height: 56px;
+        padding: 0 1rem;
+        border-radius: 999px;
+        font-weight: 500;
+        font-size: 0.9375rem;
+        color: var(--color-body);
+        transition: background-color var(--t-fast);
+    }
+    .drawer__link:hover {
+        background: var(--state);
+    }
+    .drawer__link[aria-current="page"] {
+        background: var(--tint);
+        color: var(--tint-content);
+        font-weight: 600;
+    }
+    .drawer__foot {
+        margin-top: auto;
+        padding: 1rem 1.25rem 1.25rem;
+        border-top: 1px solid var(--color-line-soft);
+        display: grid;
+        gap: 0.75rem;
+    }
+    .drawer__social {
+        display: flex;
+        justify-content: center;
+        gap: 0.25rem;
+    }
+</style>

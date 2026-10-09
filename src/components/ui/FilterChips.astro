@@ -1,0 +1,71 @@
+---
+// Material 3 filter chips (spec PJ4 / PB4). Markup only: the Phase 3 explorers wire it up.
+// Hidden without JS so no-JS visitors get the full, unfiltered list.
+interface Chip {
+    value: string;
+    label: string;
+    count?: number;
+}
+interface Props {
+    label: string;
+    chips: Chip[];
+    active?: string;
+    name?: string;
+    class?: string;
+}
+const { label, chips, active = chips[0]?.value, name = "filter", class: className } = Astro.props;
+---
+
+<div role="group" aria-label={label} class:list={["chips js-only", className]} data-chip-group={name}>
+    {
+        chips.map((chip) => (
+            <button
+                type="button"
+                class="chip"
+                data-value={chip.value}
+                aria-pressed={chip.value === active ? "true" : "false"}
+            >
+                {chip.label}
+                {chip.count !== undefined && <span class="chip__count">{chip.count}</span>}
+            </button>
+        ))
+    }
+</div>
+
+<style>
+    .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-height: 36px;
+        padding: 0 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--color-line);
+        background: transparent;
+        color: var(--color-body);
+        font-weight: 500;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition:
+            background-color var(--t-fast) var(--ease-brand),
+            border-color var(--t-fast) var(--ease-brand);
+    }
+    .chip:hover {
+        background: var(--state);
+    }
+    .chip[aria-pressed="true"] {
+        background: var(--tint);
+        border-color: transparent;
+        color: var(--tint-content);
+    }
+    .chip__count {
+        font-size: 0.8125rem;
+        color: inherit;
+        opacity: 0.85;
+    }
+</style>
