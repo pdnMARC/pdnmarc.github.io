@@ -4,6 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import mdx from "@astrojs/mdx";
+import rehypeExternalLinks from "rehype-external-links";
 import sitemap from "@astrojs/sitemap";
 import icon from "astro-icon";
 import path from "node:path";
@@ -41,7 +42,17 @@ export default defineConfig({
   },
 
   integrations: [
-    mdx(),
+    // MDX is only used by the /docs guides: links to GitHub and other sites open in a new tab
+    // (announced to screen readers), so the guide stays open beside the file being edited.
+    mdx({
+      rehypePlugins: [
+        [rehypeExternalLinks, {
+          target: '_blank',
+          rel: ['noopener'],
+          content: { type: 'element', tagName: 'span', properties: { className: ['sr-only'] }, children: [{ type: 'text', value: ' (opens in a new tab)' }] },
+        }],
+      ],
+    }),
     preact(),
     icon(),
     sitemap({

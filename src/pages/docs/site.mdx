@@ -26,6 +26,24 @@ A few values here point at content in the other repositories and must match it e
 
 </Callout>
 
+## Profile form
+
+MARC members can add or update their profile with a Google Form instead of GitHub. Every night at 00:00
+Sri Lanka time, the **Profile Form Sync** workflow in marc_people and in marc_projects reads the form's
+response sheet and opens pull requests:
+
+- in **marc_people**, one per response, with the new or updated profile and its photo;
+- in **marc_projects**, adding the person to the projects they ticked.
+
+Responses that can't be used become an issue instead. Each pull request lists what changed, who sent it
+and the validator result, with a short review checklist. **Merge** to publish or **close** to reject;
+a response is never proposed twice. To process new responses straight away, run the workflow from the
+repository's **Actions** tab.
+
+Setup (the form, sharing, the `GOOGLE_FORM_CSV_LINK` secret) and maintenance are described in
+[marc_people/google-form/README.md](https://github.com/pdnMARC/marc_people/blob/main/google-form/README.md).
+Once the form exists, put its share link in `forms.profile` in `src/data/site.ts` so the guides show it.
+
 ## Where things are
 
 | What | Where |

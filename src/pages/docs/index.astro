@@ -5,7 +5,7 @@ import Icon from "../../components/ui/Icon.astro";
 import { docs, contentRepos, site } from "../../data/site";
 
 const where = [
-    { what: "People profiles", place: "marc_people repository, profiles/ folder", href: contentRepos.people, guide: "/docs/profiles/" },
+    { what: "People profiles", place: "Profile form, or marc_people repository, profiles/ folder", href: contentRepos.people, guide: "/docs/profiles/" },
     { what: "Projects", place: "marc_projects repository, projects/ folder", href: contentRepos.projects, guide: "/docs/projects/" },
     { what: "News articles and vacancies", place: "marc_news repository, articles/ folder", href: contentRepos.news, guide: "/docs/news/" },
     { what: "Social feed items", place: "Website data Google Sheet, News tab", guide: "/docs/news/#social-feed-items" },
@@ -18,8 +18,8 @@ const tasks = [
     {
         title: "A new member joins MARC and a project",
         steps: [
-            { where: "marc_people", href: "/docs/profiles/#add-a-new-profile", text: "add their profile, with their email and name, plus any other addresses (otherEmails) and the forms of their name used in their papers (otherNames)." },
-            { where: "marc_projects", href: "/docs/profiles/#add-yourself-to-your-projects", text: "add the same email to each project they work on." },
+            { where: "Profile form", href: "/docs/profiles/#use-the-profile-form", text: "they fill it in once: profile, photo, other emails and names, and the projects they work on." },
+            { where: "Or on GitHub", href: "/docs/profiles/#add-a-new-profile", text: "add the profile in marc_people and their email to each project file in marc_projects." },
             { where: "Their papers", href: "/docs/publications/#linking-papers-to-people", text: "check each paper appears on their profile; if not, add the author-list form of their name to otherNames." },
         ],
     },
@@ -32,13 +32,13 @@ const tasks = [
     {
         title: "Someone's email address changes",
         steps: [
-            { where: "marc_people", href: "/docs/profiles/#changing-your-email-or-name", text: "put the new address in email and move the old one to otherEmails. Project files stay as they are." },
+            { where: "Profile form", href: "/docs/profiles/#use-the-profile-form", text: "enter the new address under Other email addresses. Project files stay as they are." },
         ],
     },
     {
         title: "Someone leaves MARC",
         steps: [
-            { where: "marc_people", href: "/docs/profiles/#when-you-leave-marc", text: "set status: past and, if known, currentPosition. Don't delete the profile." },
+            { where: "Profile form", href: "/docs/profiles/#use-the-profile-form", text: "choose Past member and say where they are now (or set status: past on GitHub). Don't delete the profile." },
             { where: "marc_projects", href: "/docs/profiles/#when-you-leave-marc", text: "nothing to change: they stay on their projects, marked as a past member." },
         ],
     },

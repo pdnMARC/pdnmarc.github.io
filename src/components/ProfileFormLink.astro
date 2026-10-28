@@ -1,0 +1,67 @@
+---
+// "Use the profile form" box for the documentation guides (forms.profile in src/data/site.ts).
+import Button from "./ui/Button.astro";
+import Icon from "./ui/Icon.astro";
+import Todo from "./ui/Todo.astro";
+import { forms, site } from "../data/site";
+---
+
+<div class="form-link surface-tonal not-prose">
+    <span class="form-link__icon"><Icon name="material-symbols:assignment-outline" /></span>
+    <div class="flex-1">
+        <p class="form-link__title">No GitHub account needed</p>
+        <p class="mt-1 text-[0.9375rem]">
+            {
+                forms.profile ? (
+                    "Add or update your profile, photo and projects with one form."
+                ) : (
+                    <>
+                        Ask the MARC website maintainers for the profile form link at{" "}
+                        <a href={`mailto:${site.email}?subject=${encodeURIComponent("Profile form link")}`} class="text-primary underline">
+                            {site.email}
+                        </a>
+                        .
+                    </>
+                )
+            }
+        </p>
+    </div>
+    {
+        forms.profile && (
+            <Button href={forms.profile} external icon="material-symbols:arrow-outward">
+                Open the profile form
+            </Button>
+        )
+    }
+</div>
+{!forms.profile && <Todo>Set forms.profile in src/data/site.ts to the form's share link (marc_people/google-form/README.md, step 7).</Todo>}
+
+<style>
+    .form-link {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem 1.25rem;
+        margin: 1.5rem 0;
+        padding: 1.25rem 1.5rem;
+    }
+    .form-link__icon {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--color-base-100);
+        color: var(--color-primary);
+    }
+    .form-link__icon :global(svg) {
+        width: 1.375rem;
+        height: 1.375rem;
+    }
+    .form-link__title {
+        font-family: var(--font-head);
+        font-weight: 600;
+        color: var(--color-heading);
+    }
+</style>

@@ -5,10 +5,34 @@ description: Add yourself to the People page, or update your photo, role and bio
 ---
 
 import Callout from "../../components/ui/Callout.astro";
+import ProfileFormLink from "../../components/ProfileFormLink.astro";
 
-Each person at MARC keeps their own profile up to date. Profiles live in the
-[marc_people repository](https://github.com/pdnMARC/marc_people) on GitHub: one Markdown file per person
-in the `profiles/` folder, with photos in `profiles/photos/`.
+Each person at MARC keeps their own profile up to date, either with the **profile form** (no GitHub
+account needed) or by editing it on GitHub.
+
+## Use the profile form
+
+<ProfileFormLink />
+
+The form adds a new profile or updates yours, and keeps every link intact:
+
+- **Updating?** Fill in only what should change. Blank answers keep what is already there.
+- **Other email addresses and other forms of your name** are added to your profile, never removed, so
+  projects and papers that use them stay linked to you.
+- **Photo:** upload a JPG, PNG or WebP image. It is resized and its camera and location data removed.
+- **Projects:** tick the projects you work on and you are added to their teams.
+- **Leaving MARC?** Choose *Past member* and say where you are now.
+
+Every night at midnight (Sri Lanka time) your answers become a change request. It goes live once a MARC
+maintainer approves it. If something can't be used, for example an update from an address that is not in
+any profile, a maintainer will be in touch.
+
+The rest of this guide is for editing on GitHub, and explains what each field means.
+
+## Edit on GitHub
+
+Profiles live in the [marc_people repository](https://github.com/pdnMARC/marc_people) on GitHub: one
+Markdown file per person in the `profiles/` folder, with photos in `profiles/photos/`.
 
 ```text
 marc_people/

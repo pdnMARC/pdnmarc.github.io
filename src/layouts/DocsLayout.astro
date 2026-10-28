@@ -47,6 +47,10 @@ const current = Astro.url.pathname.replace(/\/?$/, "/");
     </div>
 </BaseLayout>
 
+<script>
+    import "../scripts/copy-code";
+</script>
+
 <style>
     .docs {
         display: grid;
@@ -112,5 +116,61 @@ const current = Astro.url.pathname.replace(/\/?$/, "/");
     .docs__body :global(table) {
         display: block;
         overflow-x: auto;
+    }
+
+    /* Links that leave the site (GitHub etc.) open in a new tab: mark them with ↗ (astro.config.mjs). */
+    .docs__body :global(a[target="_blank"])::after {
+        content: "";
+        display: inline-block;
+        width: 0.75em;
+        height: 0.75em;
+        margin-left: 0.15em;
+        vertical-align: 0.05em;
+        background: currentColor;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.4 18L5 16.6L14.6 7H6V5h12v12h-2V8.4z'/%3E%3C/svg%3E") center / contain no-repeat;
+    }
+
+    /* Copy button on code blocks (src/scripts/copy-code.ts). Code blocks use a dark theme in both modes. */
+    .docs__body :global(.code-copy) {
+        position: relative;
+    }
+    .docs__body :global(.code-copy pre) {
+        padding-right: 6.5rem;
+    }
+    .docs__body :global(.code-copy__btn) {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        min-height: 32px;
+        padding: 0 0.75rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.08);
+        color: #e6edf3;
+        font-family: var(--font-sans);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition:
+            background-color var(--t-fast),
+            border-color var(--t-fast);
+    }
+    .docs__body :global(.code-copy__btn:hover) {
+        background: rgba(255, 255, 255, 0.16);
+    }
+    .docs__body :global(.code-copy__btn:focus-visible) {
+        outline: 2px solid #fff;
+        outline-offset: 2px;
+    }
+    .docs__body :global(.code-copy__btn.is-done) {
+        border-color: #7ee2a8;
+        color: #7ee2a8;
+    }
+    .docs__body :global(.code-copy__btn svg) {
+        width: 1rem;
+        height: 1rem;
     }
 </style>
