@@ -198,7 +198,7 @@ Email matching ignores upper and lower case, so `Jane.Doe@…` and `jane.doe@…
 
 | Field | Required | Purpose |
 | --- | --- | --- |
-| `post` | Yes | Your role. Use exactly one of `Director`, `Deputy Director`, `Research Assistant` or `Volunteer`. The People page groups people by role. |
+| `post` | Yes | Your role. Use exactly one of `Director`, `Deputy Director`, `Project Coordinator`, `Research Engineer`, `Research Assistant`, `Research Intern` or `Volunteer`. The People page groups people by role; see [Roles](#roles). |
 | `photo` | No | Path to your photo, starting with `./photos/`. Without one, a neutral avatar is shown. |
 | `status` | No | `current` (the default) or `past`. Past members are listed under **Past members**. See [When you leave MARC](#when-you-leave-marc). |
 | `currentPosition` | No | For past members only: where you are now, for example `"PhD, Columbia University, USA"`. Shown as "Now: …". |
@@ -207,6 +207,20 @@ Email matching ignores upper and lower case, so `Jane.Doe@…` and `jane.doe@…
 The **file name** sets your page address: `Jane_Doe.md` becomes `/people/jane_doe/`. Nothing on the site
 depends on it, but renaming the file changes the address, so links shared elsewhere (a CV, an email
 signature) stop working.
+
+## Roles
+
+The People page groups current members by their `post`, under these headings:
+
+| `post` | Heading on the People page |
+| --- | --- |
+| `Director` | Director |
+| `Deputy Director` | Deputy Directors |
+| `Project Coordinator`, `Research Engineer`, `Research Assistant`, `Research Intern` | Engineers, Research Assistants & Coordinators |
+| `Volunteer` | Volunteers |
+
+The role is also shown on your profile and on the teams of your projects. Changing it is safe: nothing
+links by role. In the profile form, choose your role under *Your role at MARC*.
 
 ## Changing your email or name
 
@@ -277,7 +291,7 @@ currentPosition: "PhD, Example University, USA"
 When you open a pull request, an automatic check validates every profile. If it fails, open the
 **Checks** tab of the pull request to see which file and field to fix. The most common problems:
 
-- a `post` that is not one of the four roles;
+- a `post` that is not one of the [roles](#roles), spelled exactly;
 - an address (in `email` or `otherEmails`) already used by another profile;
 - a name form already used by another profile, or one with only one word;
 - a `status` other than `current` or `past`, or a `currentPosition` without `status: past`;

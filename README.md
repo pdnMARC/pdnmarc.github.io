@@ -9,7 +9,7 @@ The actual content is split across separate repositories:
 - [`marc_projects`](https://github.com/pdnMARC/marc_projects)
 - [`marc_news`](https://github.com/pdnMARC/marc_news)
 
-In addition, some structured data is pulled from a shared Google Sheet and converted into JSON during the build/update flow.
+In addition, publications and the social feed are pulled from two Google Sheets and converted into JSON during the build/update flow.
 
 > [!IMPORTANT]
 > A GitHub Personal Access Token (PAT) is used to connect the dependent repositories and trigger automatic website updates when one of those repositories changes.
@@ -29,21 +29,44 @@ The website is built with:
 The main idea is:
 - this repository defines the website code and the content schemas
 - [`marc_people`](https://github.com/pdnMARC/marc_people), [`marc_projects`](https://github.com/pdnMARC/marc_projects), and [`marc_news`](https://github.com/pdnMARC/marc_news) hold the Markdown content and images for their respective sections
-- a Google Sheet provides publication data and social feed data
+- two Google Sheets provide publication data and social feed data
+- Google Forms let members send profiles and news without GitHub; nightly workflows in the content repositories turn the responses into pull requests
 - the deployment workflow pulls all of this together, then builds and deploys the site
 
 ## :triangular_ruler: High-level architecture
 
 ```mermaid
 flowchart TD
-    A[MARC_Website repo Astro site pages layouts schemas] --> B[GitHub Actions deploy workflow]
-    C[marc_people repo people profiles] --> B
-    D[marc_projects repo project entries] --> B
-    E[marc_news repo markdown news articles] --> B
-    F[Google Sheet publications and social feed] --> G[python_scripts get_data.py]
+    subgraph forms["📝 Google Forms"]
+        PF["👤 Profile form"]
+        NF["📰 News form"]
+    end
+    subgraph repos["📦 Content repositories"]
+        C["👥 marc_people<br/>profiles/"]
+        D["🔬 marc_projects<br/>projects/"]
+        E["🗞️ marc_news<br/>articles/"]
+    end
+    subgraph sheets["📊 Google Sheets"]
+        S1["📚 MARC Publications<br/>one tab per project"]
+    end
+    A["💻 This repository<br/>Astro site, layouts,<br/>schemas"]
+    G["🐍 get_data.py<br/>sheets → JSON"]
+    B["⚙️ Deploy to GitHub Pages<br/>runs on a push to main,<br/>a content repo merge,<br/>Mondays 00:00 (Sri Lanka)<br/>or by hand"]
+    H["🌐 Live site<br/>GitHub Pages"]
+
+    PF -->|"nightly sync: pull requests"| C
+    PF -->|"nightly sync: pull requests"| D
+    NF -->|"nightly sync: pull requests"| E
+    C -->|"cloned at build"| B
+    D -->|"cloned at build"| B
+    E -->|"cloned at build"| B
+    S1 --> G
     G --> B
-    B --> H[Built site on GitHub Pages]
+    A --> B
+    B --> H
 ```
+
+Merged pull requests in the content repositories trigger the deploy through their `trigger-site.yml` workflows. Form responses only reach the site once a maintainer merges their pull request.
 
 ## :card_file_box: External content repositories
 
@@ -64,7 +87,7 @@ These entries are cloned into the website build as the news collection.
 
 `src/content.config.ts` reads each repository's subfolder, and falls back to the repository root for checkouts from before the move.
 
-## :bar_chart: Google Sheet data source
+## :bar_chart: Google Sheet data sources
 
 The website also pulls structured data from two Google Sheets:
 - **MARC Publications** (one tab per project, the main publications source): `https://docs.google.com/spreadsheets/d/15PZaRMJgW67znlJmfxWFvE1iHpc4NrFmBHFR3n7ldWc/edit?usp=sharing`
@@ -79,7 +102,7 @@ The sheets are read on every deployment, and the deploy workflow also runs every
 
 So the website has two kinds of news-related content:
 - full Markdown news articles from [`marc_news`](https://github.com/pdnMARC/marc_news)
-- shorter social feed items from the Google Sheet
+- shorter social feed items from the Website data sheet
 
 ## :rocket: Deployment flow
 
@@ -107,7 +130,7 @@ That file is the main place where the website defines what each collection shoul
 
 In practice:
 - people, projects, and markdown news come from external repositories as Markdown collections
-- publications and social feed data come from JSON files generated from the Google Sheet
+- publications and social feed data come from JSON files generated from the Google Sheets
 
 ## :computer: Local development
 
@@ -147,14 +170,14 @@ If you want to change content, usually edit one of the content repositories inst
 - [`marc_projects`](https://github.com/pdnMARC/marc_projects) for project entries
 - [`marc_news`](https://github.com/pdnMARC/marc_news) for Markdown news articles
 
-If you want to update publications or social feed items, use the Google Sheet rather than editing generated JSON by hand.
+If you want to update publications or social feed items, use the Google Sheets rather than editing generated JSON by hand.
 
 ## :information_source: Useful things for contributors
 
 A few practical points:
 - changes to content repositories affect what this website shows, even if this repository itself is unchanged
 - changing a content schema here may require matching updates in the corresponding content repository
-- the generated JSON files for publications and social feed come from the Google Sheet and Python sync script, so manual edits to those generated files are usually not the source of truth
+- the generated JSON files for publications and social feed come from the Google Sheets and the Python sync script, so manual edits to those generated files are usually not the source of truth
 - the deployment workflow is the place to check if content appears locally but not on the live site, or vice versa
 
 ## :link: Repository role in the larger setup
@@ -164,7 +187,8 @@ A short summary of responsibilities:
 - [`marc_people`](https://github.com/pdnMARC/marc_people): people Markdown content
 - [`marc_projects`](https://github.com/pdnMARC/marc_projects): projects Markdown content
 - [`marc_news`](https://github.com/pdnMARC/marc_news): Markdown news content
-- Google Sheet: publications and social feed source data
+- Google Sheets: publications and social feed source data
+- Google Forms: profile and news submissions, which arrive as pull requests in the content repositories
 
 ## :memo: Future documentation
 
